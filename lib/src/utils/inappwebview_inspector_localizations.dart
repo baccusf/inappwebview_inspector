@@ -19,7 +19,8 @@ class InAppWebViewInspectorLocalizations {
   });
 
   /// English localization (default)
-  static const InAppWebViewInspectorLocalizations english = InAppWebViewInspectorLocalizations(
+  static const InAppWebViewInspectorLocalizations english =
+      InAppWebViewInspectorLocalizations(
     activeWebView: 'Active WebView:',
     javascriptPlaceholder: 'Enter JavaScript...',
     execute: 'Execute',
@@ -30,7 +31,8 @@ class InAppWebViewInspectorLocalizations {
   );
 
   /// Korean localization
-  static const InAppWebViewInspectorLocalizations korean = InAppWebViewInspectorLocalizations(
+  static const InAppWebViewInspectorLocalizations korean =
+      InAppWebViewInspectorLocalizations(
     activeWebView: '활성화된 웹뷰:',
     javascriptPlaceholder: 'JavaScript를 입력해주세요...',
     execute: '실행',
@@ -41,7 +43,8 @@ class InAppWebViewInspectorLocalizations {
   );
 
   /// Japanese localization
-  static const InAppWebViewInspectorLocalizations japanese = InAppWebViewInspectorLocalizations(
+  static const InAppWebViewInspectorLocalizations japanese =
+      InAppWebViewInspectorLocalizations(
     activeWebView: 'アクティブWebView:',
     javascriptPlaceholder: 'JavaScriptを入力してください...',
     execute: '実行',
@@ -52,7 +55,8 @@ class InAppWebViewInspectorLocalizations {
   );
 
   /// Spanish localization
-  static const InAppWebViewInspectorLocalizations spanish = InAppWebViewInspectorLocalizations(
+  static const InAppWebViewInspectorLocalizations spanish =
+      InAppWebViewInspectorLocalizations(
     activeWebView: 'WebView Activo:',
     javascriptPlaceholder: 'Ingrese JavaScript...',
     execute: 'Ejecutar',
@@ -63,7 +67,8 @@ class InAppWebViewInspectorLocalizations {
   );
 
   /// French localization
-  static const InAppWebViewInspectorLocalizations french = InAppWebViewInspectorLocalizations(
+  static const InAppWebViewInspectorLocalizations french =
+      InAppWebViewInspectorLocalizations(
     activeWebView: 'WebView Active:',
     javascriptPlaceholder: 'Entrez du JavaScript...',
     execute: 'Exécuter',
@@ -74,7 +79,8 @@ class InAppWebViewInspectorLocalizations {
   );
 
   /// German localization
-  static const InAppWebViewInspectorLocalizations german = InAppWebViewInspectorLocalizations(
+  static const InAppWebViewInspectorLocalizations german =
+      InAppWebViewInspectorLocalizations(
     activeWebView: 'Aktive WebView:',
     javascriptPlaceholder: 'JavaScript eingeben...',
     execute: 'Ausführen',
@@ -85,7 +91,8 @@ class InAppWebViewInspectorLocalizations {
   );
 
   /// Chinese Simplified localization
-  static const InAppWebViewInspectorLocalizations chineseSimplified = InAppWebViewInspectorLocalizations(
+  static const InAppWebViewInspectorLocalizations chineseSimplified =
+      InAppWebViewInspectorLocalizations(
     activeWebView: '活动WebView:',
     javascriptPlaceholder: '输入JavaScript...',
     execute: '执行',
@@ -96,7 +103,8 @@ class InAppWebViewInspectorLocalizations {
   );
 
   /// Portuguese localization
-  static const InAppWebViewInspectorLocalizations portuguese = InAppWebViewInspectorLocalizations(
+  static const InAppWebViewInspectorLocalizations portuguese =
+      InAppWebViewInspectorLocalizations(
     activeWebView: 'WebView Ativa:',
     javascriptPlaceholder: 'Digite JavaScript...',
     execute: 'Executar',
@@ -107,7 +115,8 @@ class InAppWebViewInspectorLocalizations {
   );
 
   /// Get localization by language code
-  static InAppWebViewInspectorLocalizations getByLanguageCode(String languageCode) {
+  static InAppWebViewInspectorLocalizations getByLanguageCode(
+      String languageCode) {
     switch (languageCode.toLowerCase()) {
       case 'ko':
       case 'ko_kr':

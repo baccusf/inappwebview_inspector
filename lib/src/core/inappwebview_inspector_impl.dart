@@ -30,7 +30,8 @@ class InAppWebViewInspectorImpl implements InAppWebViewInspectorInterface {
       _webViewsController =
       StreamController<Map<String, InAppWebViewInspectorInstance>>.broadcast();
 
-  InAppWebViewInspectorImpl([this._config = InAppWebViewInspectorConfig.defaultConfig]);
+  InAppWebViewInspectorImpl(
+      [this._config = InAppWebViewInspectorConfig.defaultConfig]);
 
   // Stream getters for reactive updates
   Stream<List<InAppWebViewInspectorConsoleMessage>> get consoleLogsStream =>
@@ -132,7 +133,7 @@ class InAppWebViewInspectorImpl implements InAppWebViewInspectorInterface {
     );
 
     _addConsoleLogInternal(consoleLog);
-    
+
     // Call custom callback if provided
     _config.onConsoleLog?.call(consoleLog);
   }
@@ -140,7 +141,7 @@ class InAppWebViewInspectorImpl implements InAppWebViewInspectorInterface {
   @override
   void addCustomConsoleLog(InAppWebViewInspectorConsoleMessage message) {
     _addConsoleLogInternal(message);
-    
+
     // Call custom callback if provided
     _config.onConsoleLog?.call(message);
   }
@@ -168,7 +169,7 @@ class InAppWebViewInspectorImpl implements InAppWebViewInspectorInterface {
 
     try {
       String normalizedScript = script;
-      
+
       if (_config.enableUnicodeQuoteNormalization) {
         // Convert unicode quotes to regular quotes
         normalizedScript = script
@@ -180,10 +181,12 @@ class InAppWebViewInspectorImpl implements InAppWebViewInspectorInterface {
 
       // Use enhanced script wrapping for better DOM object handling
       String wrappedScript;
-      
+
       if (_config.enableBase64ScriptEncoding) {
         // Use safe serialization wrapping, then encode as Base64
-        final safeScript = InAppWebViewInspectorScriptUtils.wrapScriptForSafeSerialization(normalizedScript);
+        final safeScript =
+            InAppWebViewInspectorScriptUtils.wrapScriptForSafeSerialization(
+                normalizedScript);
         final scriptBytes = utf8.encode(safeScript);
         final base64Script = base64Encode(scriptBytes);
 
@@ -201,12 +204,15 @@ class InAppWebViewInspectorImpl implements InAppWebViewInspectorInterface {
         ''';
       } else {
         // Use safe serialization wrapping directly
-        wrappedScript = InAppWebViewInspectorScriptUtils.wrapScriptForSafeSerialization(normalizedScript);
+        wrappedScript =
+            InAppWebViewInspectorScriptUtils.wrapScriptForSafeSerialization(
+                normalizedScript);
       }
 
       // Execute the script and capture the result
-      final result = await activeWebView.controller.evaluateJavascript(source: wrappedScript);
-      
+      final result = await activeWebView.controller
+          .evaluateJavascript(source: wrappedScript);
+
       // Enhanced result handling
       if (result != null) {
         String resultString;
@@ -216,7 +222,8 @@ class InAppWebViewInspectorImpl implements InAppWebViewInspectorInterface {
             if (result.containsKey('type')) {
               switch (result['type']) {
                 case 'DOM_ELEMENT':
-                  resultString = 'DOM Element: <${result['tagName']}>${result['id'].isNotEmpty ? ' id="${result['id']}"' : ''}${result['className'].isNotEmpty ? ' class="${result['className']}"' : ''} textContent: "${result['textContent']}"';
+                  resultString =
+                      'DOM Element: <${result['tagName']}>${result['id'].isNotEmpty ? ' id="${result['id']}"' : ''}${result['className'].isNotEmpty ? ' class="${result['className']}"' : ''} textContent: "${result['textContent']}"';
                   break;
                 case 'NODE_COLLECTION':
                   final items = result['items'] as List? ?? [];
@@ -225,20 +232,22 @@ class InAppWebViewInspectorImpl implements InAppWebViewInspectorInterface {
                     final id = item['id'] ?? '';
                     final className = item['className'] ?? '';
                     final textContent = item['textContent'] ?? '';
-                    
+
                     String desc = '<$tag';
                     if (id.isNotEmpty) desc += ' id="$id"';
                     if (className.isNotEmpty) desc += ' class="$className"';
                     desc += '>';
                     if (textContent.isNotEmpty) desc += ' "$textContent"';
-                    
+
                     return desc;
                   }).toList();
-                  
-                  resultString = 'NodeList (${result['length']} items): ${itemStrings.join(', ')}';
+
+                  resultString =
+                      'NodeList (${result['length']} items): ${itemStrings.join(', ')}';
                   break;
                 case 'FUNCTION':
-                  resultString = 'Function: ${result['name']}() { ${result['source']} }';
+                  resultString =
+                      'Function: ${result['name']}() { ${result['source']} }';
                   break;
                 case 'EXECUTION_ERROR':
                   resultString = 'Error: ${result['error']}';
@@ -251,23 +260,26 @@ class InAppWebViewInspectorImpl implements InAppWebViewInspectorInterface {
             }
           } else if (result is List) {
             // Handle array results (e.g., from querySelectorAll)
-            if (result.isNotEmpty && result.first is Map && result.first.containsKey('tagName')) {
+            if (result.isNotEmpty &&
+                result.first is Map &&
+                result.first.containsKey('tagName')) {
               final elementStrings = result.map((item) {
                 final tag = item['tagName'] ?? 'unknown';
                 final id = item['id'] ?? '';
                 final className = item['className'] ?? '';
                 final textContent = item['textContent'] ?? '';
-                
+
                 String desc = '<$tag';
                 if (id.isNotEmpty) desc += ' id="$id"';
                 if (className.isNotEmpty) desc += ' class="$className"';
                 desc += '>';
                 if (textContent.isNotEmpty) desc += ' "$textContent"';
-                
+
                 return desc;
               }).toList();
-              
-              resultString = 'Elements (${result.length}): ${elementStrings.join(', ')}';
+
+              resultString =
+                  'Elements (${result.length}): ${elementStrings.join(', ')}';
             } else {
               resultString = jsonEncode(result);
             }
@@ -279,7 +291,7 @@ class InAppWebViewInspectorImpl implements InAppWebViewInspectorInterface {
         } catch (e) {
           resultString = '[Cannot convert result to string: $e]';
         }
-        
+
         // Add result message to console output with ">>" prefix
         addCustomConsoleLog(InAppWebViewInspectorConsoleMessage(
           webViewId: _activeWebViewId,
@@ -300,12 +312,14 @@ class InAppWebViewInspectorImpl implements InAppWebViewInspectorInterface {
           timestamp: DateTime.now(),
         ));
       }
-      
+
       // Call custom callback if provided
       _config.onScriptExecuted?.call(script, _activeWebViewId);
     } catch (e) {
       // Enhanced error handling with suggestions
-      final enhancedError = InAppWebViewInspectorScriptUtils.createEnhancedErrorMessage(e.toString(), script);
+      final enhancedError =
+          InAppWebViewInspectorScriptUtils.createEnhancedErrorMessage(
+              e.toString(), script);
       addCustomConsoleLog(InAppWebViewInspectorConsoleMessage(
         webViewId: _activeWebViewId,
         level: ConsoleMessageLevel.ERROR,
@@ -314,20 +328,22 @@ class InAppWebViewInspectorImpl implements InAppWebViewInspectorInterface {
         line: 0,
         timestamp: DateTime.now(),
       ));
-      
+
       // Call custom error callback if provided
       _config.onError?.call(enhancedError, _activeWebViewId);
     }
   }
 
   @override
-  List<InAppWebViewInspectorConsoleMessage> get consoleLogs => List.unmodifiable(_consoleLogs);
+  List<InAppWebViewInspectorConsoleMessage> get consoleLogs =>
+      List.unmodifiable(_consoleLogs);
 
   @override
   String get activeWebViewId => _activeWebViewId;
 
   @override
-  Map<String, InAppWebViewInspectorInstance> get webViews => Map.unmodifiable(_webViews);
+  Map<String, InAppWebViewInspectorInstance> get webViews =>
+      Map.unmodifiable(_webViews);
 
   @override
   bool get isInspectorVisible => _isInspectorVisible;

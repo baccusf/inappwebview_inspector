@@ -3,8 +3,9 @@ import '../utils/inappwebview_inspector_constants.dart';
 
 /// WebView inspector script history manager - Memory only storage
 class InAppWebViewInspectorScriptHistoryManager {
-  static const int _maxHistoryCount = InAppWebViewInspectorConstants.maxHistoryCount;
-  
+  static const int _maxHistoryCount =
+      InAppWebViewInspectorConstants.maxHistoryCount;
+
   /// Default frequently used scripts
   static final List<String> _defaultScripts = [
     'console.log("Hello World");',
@@ -34,16 +35,17 @@ class InAppWebViewInspectorScriptHistoryManager {
   /// Initialize with default scripts and optional additional scripts
   void _initializeWithDefaults(List<String>? additionalScripts) {
     final now = DateTime.now();
-    
+
     // Add default scripts with decreasing usage counts (most useful first)
     for (int i = 0; i < _defaultScripts.length; i++) {
       _history.add(InAppWebViewInspectorScriptHistory(
         script: _defaultScripts[i],
         timestamp: now.subtract(Duration(minutes: i)),
-        usageCount: _defaultScripts.length - i, // Higher count for earlier scripts
+        usageCount:
+            _defaultScripts.length - i, // Higher count for earlier scripts
       ));
     }
-    
+
     // Add any additional initial scripts
     if (additionalScripts != null) {
       for (final script in additionalScripts) {
@@ -56,39 +58,42 @@ class InAppWebViewInspectorScriptHistoryManager {
         }
       }
     }
-    
+
     _sortHistory();
   }
-  
+
   /// Check if script already exists in history
   bool _containsScript(String script) {
     return _history.any((h) => h.script == script);
   }
-  
+
   /// Sort history by usage frequency and recency
   void _sortHistory() {
     _history.sort((a, b) {
       final usageComparison = b.usageCount.compareTo(a.usageCount);
-      if (usageComparison != InAppWebViewInspectorConstants.compareEqual) return usageComparison;
+      if (usageComparison != InAppWebViewInspectorConstants.compareEqual)
+        return usageComparison;
       return b.timestamp.compareTo(a.timestamp);
     });
   }
 
   /// Get current history list (latest first)
-  List<InAppWebViewInspectorScriptHistory> get history => List.unmodifiable(_history);
-  
+  List<InAppWebViewInspectorScriptHistory> get history =>
+      List.unmodifiable(_history);
+
   /// Get current history list (latest first) as Future for compatibility
-  Future<List<InAppWebViewInspectorScriptHistory>> getHistory() async => List.unmodifiable(_history);
+  Future<List<InAppWebViewInspectorScriptHistory>> getHistory() async =>
+      List.unmodifiable(_history);
 
   /// Add script to history
   void addScript(String script) {
     if (script.trim().isEmpty) return;
 
     final trimmedScript = script.trim();
-    
+
     // Check if the same script already exists
     final existingIndex = _history.indexWhere((h) => h.script == trimmedScript);
-    
+
     if (existingIndex != InAppWebViewInspectorConstants.notFoundIndex) {
       // Increase usage count and update timestamp for existing script
       final existing = _history[existingIndex];
@@ -119,7 +124,7 @@ class InAppWebViewInspectorScriptHistoryManager {
     _history.clear();
     _initializeWithDefaults(null); // Reinitialize with defaults
   }
-  
+
   /// Clear all history including defaults
   void clearAllHistory() {
     _history.clear();
@@ -128,7 +133,7 @@ class InAppWebViewInspectorScriptHistoryManager {
   /// Search scripts (partial match)
   List<InAppWebViewInspectorScriptHistory> searchScripts(String query) {
     if (query.trim().isEmpty) return history;
-    
+
     final lowercaseQuery = query.toLowerCase();
     return _history
         .where((h) => h.script.toLowerCase().contains(lowercaseQuery))
@@ -140,21 +145,22 @@ class InAppWebViewInspectorScriptHistoryManager {
     _history.clear();
     _initializeWithDefaults(null);
   }
-  
+
   /// Add custom default scripts (useful for specific app needs)
   void addCustomDefaults(List<String> customScripts) {
     final now = DateTime.now();
-    
+
     for (final script in customScripts) {
       if (script.trim().isNotEmpty && !_containsScript(script.trim())) {
         _history.add(InAppWebViewInspectorScriptHistory(
           script: script.trim(),
           timestamp: now,
-          usageCount: InAppWebViewInspectorConstants.defaultUsageCount + 1, // Slightly higher than default
+          usageCount: InAppWebViewInspectorConstants.defaultUsageCount +
+              1, // Slightly higher than default
         ));
       }
     }
-    
+
     _sortHistory();
   }
 }
