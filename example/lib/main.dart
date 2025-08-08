@@ -9,7 +9,8 @@ void main() {
   InAppWebViewInspector.initializeDevelopment(
     enableScriptHistory: true,
     maxScriptHistoryCount: 25, // Allow more scripts in history
-    localizations: InAppWebViewInspectorLocalizations.english, // Change this to test other languages
+    localizations: InAppWebViewInspectorLocalizations
+        .english, // Change this to test other languages
     // Removed debug callbacks for production-ready example
   );
 

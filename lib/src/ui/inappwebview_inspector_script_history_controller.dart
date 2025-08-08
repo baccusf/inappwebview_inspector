@@ -29,12 +29,12 @@ class InAppWebViewInspectorScriptHistoryController with ChangeNotifier {
     _historyManager.clearHistory();
     _loadHistory(); // 기본 스크립트들로 다시 로드
   }
-  
+
   void clearAllHistory() {
     _historyManager.clearAllHistory();
     _loadHistory();
   }
-  
+
   void resetToDefaults() {
     _historyManager.resetToDefaults();
     _loadHistory();

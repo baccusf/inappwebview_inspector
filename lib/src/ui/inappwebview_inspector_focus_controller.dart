@@ -6,7 +6,7 @@ class InAppWebViewInspectorFocusController {
   final VoidCallback? onFocusGained;
   final VoidCallback? onFocusLost;
   final Function(String)? onTextChanged;
-  
+
   bool _isManuallyClosedByX = false;
 
   InAppWebViewInspectorFocusController({
