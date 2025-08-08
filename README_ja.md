@@ -348,6 +348,25 @@ MaterialApp(
 
 1. **"No Overlay widget found"**: インスペクターウィジェットをMaterialApp.builderからScaffold Stack内に移動
 2. **インスペクターが表示されない**: WebView登録後に`InAppWebViewInspector.enable()`が呼び出されていることを確認
+3. **gitソースflutter_inappwebviewとの依存関係の競合**: dependency overrideを追加
+
+アプリでflutter_inappwebviewをgitソースから使用している場合:
+```yaml
+dependencies:
+  inappwebview_inspector: ^0.1.1
+  flutter_inappwebview:
+    git:
+      url: https://github.com/pichillilorenzo/flutter_inappwebview.git
+      ref: master
+      path: flutter_inappwebview
+
+dependency_overrides:
+  flutter_inappwebview:
+    git:
+      url: https://github.com/pichillilorenzo/flutter_inappwebview.git
+      ref: master
+      path: flutter_inappwebview
+```
 
 ## 📋 要件
 

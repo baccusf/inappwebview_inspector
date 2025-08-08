@@ -497,6 +497,25 @@ MaterialApp(
 
 1. **"No Overlay widget found"**: Move the inspector widget from MaterialApp.builder to inside a Scaffold Stack
 2. **Inspector not showing**: Ensure you've called `InAppWebViewInspector.enable()` after registering a WebView
+3. **Dependency conflict with git-sourced flutter_inappwebview**: Add dependency override
+
+If your app uses flutter_inappwebview from git source:
+```yaml
+dependencies:
+  inappwebview_inspector: ^0.1.1
+  flutter_inappwebview:
+    git:
+      url: https://github.com/pichillilorenzo/flutter_inappwebview.git
+      ref: master
+      path: flutter_inappwebview
+
+dependency_overrides:
+  flutter_inappwebview:
+    git:
+      url: https://github.com/pichillilorenzo/flutter_inappwebview.git
+      ref: master
+      path: flutter_inappwebview
+```
 
 ### Development vs Production
 
