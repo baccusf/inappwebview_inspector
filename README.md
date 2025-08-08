@@ -497,7 +497,6 @@ MaterialApp(
 
 1. **"No Overlay widget found"**: Move the inspector widget from MaterialApp.builder to inside a Scaffold Stack
 2. **Inspector not showing**: Ensure you've called `InAppWebViewInspector.enable()` after registering a WebView
-3. **Build errors**: Make sure to use `isInspectable: true` instead of deprecated `debuggingEnabled`
 
 ### Development vs Production
 

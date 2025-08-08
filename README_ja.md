@@ -348,7 +348,6 @@ MaterialApp(
 
 1. **"No Overlay widget found"**: インスペクターウィジェットをMaterialApp.builderからScaffold Stack内に移動
 2. **インスペクターが表示されない**: WebView登録後に`InAppWebViewInspector.enable()`が呼び出されていることを確認
-3. **ビルドエラー**: 非推奨の`debuggingEnabled`の代わりに`isInspectable: true`を使用していることを確認
 
 ## 📋 要件
 

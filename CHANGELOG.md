@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.1] - 2025-08-08
+
+### 🔧 Improvements
+- **Enhanced Compatibility**: Updated SDK version requirements to match flutter_inappwebview ^6.1.5
+  - Dart SDK: ^3.0.6 → ^3.5.0
+  - Flutter: >=3.0.0 → >=3.24.0
+- **Updated Dependencies**: Kept flutter_lints at ^5.0.0 for broader SDK compatibility
+- **Documentation**: 
+  - Updated README files and fixed repository URLs
+  - Removed outdated build error note about isInspectable vs debuggingEnabled
+- **Licensing**: Added proper MIT License file
+
 ## [0.1.0] - 2025-08-08
 
 ### 🎉 Initial Release

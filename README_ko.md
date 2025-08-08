@@ -348,7 +348,6 @@ MaterialApp(
 
 1. **"No Overlay widget found"**: 검사기 위젯을 MaterialApp.builder에서 Scaffold Stack 내부로 이동
 2. **검사기가 표시되지 않음**: WebView를 등록한 후 `InAppWebViewInspector.enable()`이 호출되었는지 확인
-3. **빌드 오류**: 더 이상 사용되지 않는 `debuggingEnabled` 대신 `isInspectable: true`를 사용하는지 확인
 
 ## 📋 요구사항
 
