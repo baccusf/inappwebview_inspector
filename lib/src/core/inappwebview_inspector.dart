@@ -11,7 +11,8 @@ class InAppWebViewInspector {
     bool enableAutoResultLogging = true,
     bool enableScriptHistory = true,
     int maxScriptHistoryCount = 15,
-    InAppWebViewInspectorLocalizations localizations = InAppWebViewInspectorLocalizations.english,
+    InAppWebViewInspectorLocalizations localizations =
+        InAppWebViewInspectorLocalizations.english,
     Function(String script, String webViewId)? onScriptExecuted,
     Function(InAppWebViewInspectorConsoleMessage log)? onConsoleLog,
     Function(String error, String webViewId)? onError,
@@ -31,13 +32,15 @@ class InAppWebViewInspector {
     );
 
     InAppWebViewInspectorFactory.initialize(config: config);
-    InAppWebViewInspectorService.register(InAppWebViewInspectorFactory.getInstance());
+    InAppWebViewInspectorService.register(
+        InAppWebViewInspectorFactory.getInstance());
   }
 
   /// Initialize with custom configuration
   static void initializeWithConfig(InAppWebViewInspectorConfig config) {
     InAppWebViewInspectorFactory.initialize(config: config);
-    InAppWebViewInspectorService.register(InAppWebViewInspectorFactory.getInstance());
+    InAppWebViewInspectorService.register(
+        InAppWebViewInspectorFactory.getInstance());
   }
 
   /// Initialize with development mode (shortcut for common use case)
@@ -45,7 +48,8 @@ class InAppWebViewInspector {
     int maxConsoleLogCount = 500,
     bool enableScriptHistory = true,
     int maxScriptHistoryCount = 15,
-    InAppWebViewInspectorLocalizations localizations = InAppWebViewInspectorLocalizations.english,
+    InAppWebViewInspectorLocalizations localizations =
+        InAppWebViewInspectorLocalizations.english,
     Function(String script, String webViewId)? onScriptExecuted,
     Function(InAppWebViewInspectorConsoleMessage log)? onConsoleLog,
     Function(String error, String webViewId)? onError,
@@ -68,7 +72,8 @@ class InAppWebViewInspector {
     int maxConsoleLogCount = 100,
     bool enableAutoResultLogging = false,
     bool enableScriptHistory = false,
-    InAppWebViewInspectorLocalizations localizations = InAppWebViewInspectorLocalizations.english,
+    InAppWebViewInspectorLocalizations localizations =
+        InAppWebViewInspectorLocalizations.english,
   }) {
     initialize(
       debugMode: false,
@@ -80,13 +85,15 @@ class InAppWebViewInspector {
   }
 
   /// Get the current inspector instance
-  static InAppWebViewInspectorInterface get instance => InAppWebViewInspectorService.inspector;
+  static InAppWebViewInspectorInterface get instance =>
+      InAppWebViewInspectorService.inspector;
 
   /// Check if inspector is initialized
   static bool get isInitialized => InAppWebViewInspectorService.isRegistered;
 
   /// Auto-initialize if not already initialized (for lazy loading)
-  static InAppWebViewInspectorInterface getOrInitialize({bool debugMode = false}) {
+  static InAppWebViewInspectorInterface getOrInitialize(
+      {bool debugMode = false}) {
     if (!isInitialized) {
       initialize(debugMode: debugMode);
     }
@@ -152,8 +159,10 @@ class InAppWebViewInspector {
   }
 
   /// Check if inspector is visible
-  static bool get isVisible => isInitialized ? instance.isInspectorVisible : false;
+  static bool get isVisible =>
+      isInitialized ? instance.isInspectorVisible : false;
 
   /// Check if inspector is enabled
-  static bool get isEnabled => isInitialized ? instance.isInspectorEnabled : false;
+  static bool get isEnabled =>
+      isInitialized ? instance.isInspectorEnabled : false;
 }

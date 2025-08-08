@@ -3,7 +3,7 @@ export 'src/core/inappwebview_inspector.dart';
 export 'src/core/inappwebview_inspector_interface.dart';
 export 'src/core/inappwebview_inspector_factory.dart';
 
-// Services exports  
+// Services exports
 export 'src/services/inappwebview_inspector_script_history.dart';
 export 'src/services/inappwebview_inspector_script_history_manager.dart';
 
@@ -20,16 +20,16 @@ export 'src/utils/inappwebview_inspector_localizations.dart';
 export 'src/utils/inappwebview_inspector_script_utils.dart';
 
 /// WebView Inspector - A powerful debugging tool for flutter_inappwebview
-/// 
+///
 /// This library provides real-time console monitoring, JavaScript execution,
 /// and script history management with a draggable overlay interface.
-/// 
+///
 /// ## Quick Start
-/// 
+///
 /// ```dart
 /// // Initialize the inspector
 /// InAppWebViewInspector.initializeDevelopment();
-/// 
+///
 /// // In your WebView widget
 /// InAppWebView(
 ///   onWebViewCreated: (controller) {
@@ -40,18 +40,18 @@ export 'src/utils/inappwebview_inspector_script_utils.dart';
 ///   },
 /// )
 /// ```
-/// 
+///
 /// ## Features
-/// 
+///
 /// - 🔍 Real-time console log monitoring
-/// - ⚡ JavaScript execution and result display  
+/// - ⚡ JavaScript execution and result display
 /// - 📜 Script history with usage frequency tracking
 /// - 🎯 Multiple WebView support with selector
 /// - 🎨 Draggable overlay interface
 /// - ⚙️ Configurable settings and callbacks
-/// 
+///
 /// ## Configuration
-/// 
+///
 /// ```dart
 /// InAppWebViewInspector.initialize(
 ///   debugMode: true,

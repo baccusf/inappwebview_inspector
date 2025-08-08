@@ -22,11 +22,13 @@ class InAppWebViewInspectorScriptHistory {
   }
 
   /// Create from JSON
-  factory InAppWebViewInspectorScriptHistory.fromJson(Map<String, dynamic> json) {
+  factory InAppWebViewInspectorScriptHistory.fromJson(
+      Map<String, dynamic> json) {
     return InAppWebViewInspectorScriptHistory(
       script: json['script'] as String,
       timestamp: DateTime.fromMillisecondsSinceEpoch(json['timestamp'] as int),
-      usageCount: json['usageCount'] as int? ?? InAppWebViewInspectorConstants.defaultUsageCount,
+      usageCount: json['usageCount'] as int? ??
+          InAppWebViewInspectorConstants.defaultUsageCount,
     );
   }
 
@@ -42,7 +44,8 @@ class InAppWebViewInspectorScriptHistory {
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-    return other is InAppWebViewInspectorScriptHistory && other.script == script;
+    return other is InAppWebViewInspectorScriptHistory &&
+        other.script == script;
   }
 
   @override

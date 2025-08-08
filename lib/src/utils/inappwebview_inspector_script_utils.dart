@@ -52,16 +52,16 @@ class InAppWebViewInspectorScriptUtils {
   /// Detect potential unsupported type from script content
   static String? detectUnsupportedType(String script) {
     final scriptLower = script.toLowerCase();
-    
+
     for (final entry in unsupportedTypePatterns.entries) {
       final type = entry.key;
       final pattern = entry.value;
-      
+
       if (RegExp(pattern, caseSensitive: false).hasMatch(scriptLower)) {
         return type;
       }
     }
-    
+
     return null;
   }
 
@@ -72,37 +72,43 @@ class InAppWebViewInspectorScriptUtils {
   }
 
   /// Create enhanced error message with suggestions
-  static String createEnhancedErrorMessage(String originalError, String script) {
+  static String createEnhancedErrorMessage(
+      String originalError, String script) {
     final unsupportedType = detectUnsupportedType(script);
     final suggestions = getSuggestions(unsupportedType);
-    
+
     final buffer = StringBuffer();
     buffer.writeln('❌ JavaScript Execution Error');
     buffer.writeln('Original: $originalError');
-    
+
     if (unsupportedType != null) {
-      buffer.writeln('\n💡 Detected Issue: $unsupportedType cannot be serialized to Flutter');
+      buffer.writeln(
+          '\n💡 Detected Issue: $unsupportedType cannot be serialized to Flutter');
       buffer.writeln('\n🔧 Try these alternatives:');
       for (int i = 0; i < suggestions.length; i++) {
         buffer.writeln('${i + 1}. ${suggestions[i]}');
       }
     } else if (originalError.contains('unsupported type')) {
-      buffer.writeln('\n💡 This happens when JavaScript returns objects that cannot be converted to Flutter types');
+      buffer.writeln(
+          '\n💡 This happens when JavaScript returns objects that cannot be converted to Flutter types');
       buffer.writeln('\n🔧 General solutions:');
       buffer.writeln('1. Convert objects to JSON: JSON.stringify(yourObject)');
-      buffer.writeln('2. Extract specific properties: {prop1: obj.prop1, prop2: obj.prop2}');
-      buffer.writeln('3. Convert to primitive types: obj.toString() or obj.valueOf()');
+      buffer.writeln(
+          '2. Extract specific properties: {prop1: obj.prop1, prop2: obj.prop2}');
+      buffer.writeln(
+          '3. Convert to primitive types: obj.toString() or obj.valueOf()');
     }
-    
+
     return buffer.toString();
   }
 
   /// Wrap script to handle common unsupported types automatically
   static String wrapScriptForSafeSerialization(String script) {
     final trimmedScript = script.trim();
-    
+
     // If script looks like it returns a NodeList, auto-convert to array of info objects
-    if (RegExp(r'document\.querySelectorAll\s*\([^)]+\)\s*$').hasMatch(trimmedScript)) {
+    if (RegExp(r'document\.querySelectorAll\s*\([^)]+\)\s*$')
+        .hasMatch(trimmedScript)) {
       return '''
         (function() {
           try {
@@ -120,9 +126,11 @@ class InAppWebViewInspectorScriptUtils {
         })()
       ''';
     }
-    
+
     // If script looks like it returns a single HTMLElement
-    if (RegExp(r'document\.querySelector\s*\([^)]+\)\s*$|document\.getElementById\s*\([^)]+\)\s*$').hasMatch(trimmedScript)) {
+    if (RegExp(
+            r'document\.querySelector\s*\([^)]+\)\s*$|document\.getElementById\s*\([^)]+\)\s*$')
+        .hasMatch(trimmedScript)) {
       return '''
         (function() {
           try {
@@ -141,7 +149,7 @@ class InAppWebViewInspectorScriptUtils {
         })()
       ''';
     }
-    
+
     // If script looks like it accesses classList
     if (RegExp(r'\.classList\s*$').hasMatch(trimmedScript)) {
       return '''
@@ -155,7 +163,7 @@ class InAppWebViewInspectorScriptUtils {
         })()
       ''';
     }
-    
+
     // For other scripts, wrap in a safer way that handles various return types
     return '''
       (function() {
@@ -223,11 +231,11 @@ class InAppWebViewInspectorScriptUtils {
   /// Get a user-friendly warning message for potentially problematic scripts
   static String? getWarningMessage(String script) {
     final unsupportedType = detectUnsupportedType(script);
-    
+
     if (unsupportedType != null) {
       return '⚠️ This script might return $unsupportedType which cannot be directly shown. Consider using one of the suggested alternatives.';
     }
-    
+
     return null;
   }
 }

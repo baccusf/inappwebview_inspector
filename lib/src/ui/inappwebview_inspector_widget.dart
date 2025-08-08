@@ -18,8 +18,9 @@ enum _SizeMode {
 
   /// Get the size for this mode
   Size getSize(Size? maximizedSize, double screenWidth) {
-    final width = (screenWidth * InAppWebViewInspectorConstants.widgetScreenRatio)
-        .clamp(InAppWebViewInspectorConstants.defaultWidgetWidth, double.infinity);
+    final width =
+        (screenWidth * InAppWebViewInspectorConstants.widgetScreenRatio).clamp(
+            InAppWebViewInspectorConstants.defaultWidgetWidth, double.infinity);
 
     switch (this) {
       case _SizeMode.medium:
@@ -51,9 +52,10 @@ class _InAppWebViewInspectorWidgetState
   late InAppWebViewInspectorInterface _inspector;
   late InAppWebViewInspectorConfig _config;
   final TextEditingController _scriptController = TextEditingController();
-  
+
   /// Get the current localizations
-  InAppWebViewInspectorLocalizations get _localizations => _config.localizations;
+  InAppWebViewInspectorLocalizations get _localizations =>
+      _config.localizations;
   final ScrollController _consoleScrollController = ScrollController();
   final FocusNode _scriptFocusNode = FocusNode();
 
@@ -63,7 +65,8 @@ class _InAppWebViewInspectorWidgetState
   InAppWebViewInspectorFocusController? _focusController;
 
   Offset _position = const Offset(
-      InAppWebViewInspectorConstants.defaultPositionX, InAppWebViewInspectorConstants.defaultPositionY);
+      InAppWebViewInspectorConstants.defaultPositionX,
+      InAppWebViewInspectorConstants.defaultPositionY);
   Size _size = const Size(InAppWebViewInspectorConstants.defaultWidgetWidth,
       InAppWebViewInspectorConstants.defaultWidgetHeight);
   bool _isDragging = false;
@@ -76,7 +79,8 @@ class _InAppWebViewInspectorWidgetState
   Size _safeAreaSize = Size.zero;
 
   // Stream subscriptions
-  StreamSubscription<List<InAppWebViewInspectorConsoleMessage>>? _consoleLogsSubscription;
+  StreamSubscription<List<InAppWebViewInspectorConsoleMessage>>?
+      _consoleLogsSubscription;
   StreamSubscription<String>? _activeWebViewSubscription;
   StreamSubscription<bool>? _visibilitySubscription;
   StreamSubscription<Map<String, InAppWebViewInspectorInstance>>?
@@ -91,7 +95,8 @@ class _InAppWebViewInspectorWidgetState
   // 오버레이 상태 (더 이상 매니저 필요 없음)
 
   // UI 상태
-  double _inputFieldHeight = InAppWebViewInspectorConstants.defaultInputFieldHeight;
+  double _inputFieldHeight =
+      InAppWebViewInspectorConstants.defaultInputFieldHeight;
   final GlobalKey _inputFieldKey = GlobalKey();
 
   // 히스토리 관련 상태
@@ -194,7 +199,8 @@ class _InAppWebViewInspectorWidgetState
       if (mounted) {
         final historyManager = _historyManager;
         if (historyManager != null) {
-          _historyController = InAppWebViewInspectorScriptHistoryController(historyManager);
+          _historyController =
+              InAppWebViewInspectorScriptHistoryController(historyManager);
           _historyController?.addListener(() {
             if (mounted) {
               setState(() {
@@ -325,9 +331,11 @@ class _InAppWebViewInspectorWidgetState
   }
 
   Offset _calculateHistoryPopupPosition() {
-    final popupWidth = _size.width * InAppWebViewInspectorConstants.historyPopupWidthRatio;
+    final popupWidth =
+        _size.width * InAppWebViewInspectorConstants.historyPopupWidthRatio;
     final popupLeft = _position.dx +
-        (_size.width - popupWidth) / InAppWebViewInspectorConstants.centerDivider;
+        (_size.width - popupWidth) /
+            InAppWebViewInspectorConstants.centerDivider;
 
     // Position history popup right below the entire JavaScript input view area
     // This includes the "Console:" label, input field, and execute button area
@@ -345,7 +353,8 @@ class _InAppWebViewInspectorWidgetState
         inputViewHeight +
         inputViewPadding;
 
-    final popupTop = inputViewBottom + InAppWebViewInspectorConstants.historyPopupSpacing;
+    final popupTop =
+        inputViewBottom + InAppWebViewInspectorConstants.historyPopupSpacing;
 
     return Offset(popupLeft, popupTop);
   }
@@ -365,12 +374,15 @@ class _InAppWebViewInspectorWidgetState
   Widget _buildHistoryPopupHeader() {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(InAppWebViewInspectorConstants.defaultPadding),
+      padding:
+          const EdgeInsets.all(InAppWebViewInspectorConstants.defaultPadding),
       decoration: BoxDecoration(
         color: Colors.grey[InAppWebViewInspectorConstants.greyColorIndex700],
         borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(InAppWebViewInspectorConstants.defaultBorderRadius),
-          topRight: Radius.circular(InAppWebViewInspectorConstants.defaultBorderRadius),
+          topLeft: Radius.circular(
+              InAppWebViewInspectorConstants.defaultBorderRadius),
+          topRight: Radius.circular(
+              InAppWebViewInspectorConstants.defaultBorderRadius),
         ),
       ),
       child: Row(
@@ -423,7 +435,8 @@ class _InAppWebViewInspectorWidgetState
       child: Text(
         _localizations.noHistory,
         style: const TextStyle(
-            color: Colors.grey, fontSize: InAppWebViewInspectorConstants.defaultFontSize),
+            color: Colors.grey,
+            fontSize: InAppWebViewInspectorConstants.defaultFontSize),
       ),
     );
   }
@@ -445,15 +458,16 @@ class _InAppWebViewInspectorWidgetState
           children: [
             Expanded(
               child: Text(
-                _truncateScript(
-                    item.script, InAppWebViewInspectorConstants.scriptMaxDisplayLength),
+                _truncateScript(item.script,
+                    InAppWebViewInspectorConstants.scriptMaxDisplayLength),
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: InAppWebViewInspectorConstants.smallFontSize11,
                 ),
               ),
             ),
-            const SizedBox(width: InAppWebViewInspectorConstants.defaultPadding),
+            const SizedBox(
+                width: InAppWebViewInspectorConstants.defaultPadding),
             _buildHistoryItemInfo(item),
           ],
         ),
@@ -468,14 +482,16 @@ class _InAppWebViewInspectorWidgetState
         Text(
           '${item.usageCount}회',
           style: TextStyle(
-            color: Colors.grey[InAppWebViewInspectorConstants.greyColorIndex400],
+            color:
+                Colors.grey[InAppWebViewInspectorConstants.greyColorIndex400],
             fontSize: InAppWebViewInspectorConstants.smallFontSize,
           ),
         ),
         Text(
           _formatTimeAgo(item.timestamp),
           style: TextStyle(
-            color: Colors.grey[InAppWebViewInspectorConstants.greyColorIndex500],
+            color:
+                Colors.grey[InAppWebViewInspectorConstants.greyColorIndex500],
             fontSize: InAppWebViewInspectorConstants.verySmallFontSize,
           ),
         ),
@@ -934,7 +950,8 @@ class _InAppWebViewInspectorWidgetState
                         ),
                         child: Text(
                           _localizations.execute,
-                          style: const TextStyle(fontSize: 10, color: Colors.white),
+                          style: const TextStyle(
+                              fontSize: 10, color: Colors.white),
                         ),
                       ),
                     ),
@@ -1138,8 +1155,9 @@ class _InAppWebViewInspectorWidgetState
     final safeAreaSize = _safeAreaSize;
 
     // Calculate responsive size with bounds checking
-    final maxWidth = (_size.width * InAppWebViewInspectorConstants.historyPopupWidthRatio)
-        .clamp(200.0, safeAreaSize.width - 40);
+    final maxWidth =
+        (_size.width * InAppWebViewInspectorConstants.historyPopupWidthRatio)
+            .clamp(200.0, safeAreaSize.width - 40);
     final maxHeight = InAppWebViewInspectorConstants.historyPopupHeight
         .clamp(120.0, safeAreaSize.height - 100);
     final size = Size(maxWidth, maxHeight);
