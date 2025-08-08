@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Enhanced Compatibility**: Updated SDK version requirements to match flutter_inappwebview ^6.1.5
   - Dart SDK: ^3.0.6 → ^3.5.0
   - Flutter: >=3.0.0 → >=3.24.0
-- **Updated Dependencies**: Updated flutter_lints to ^6.0.0 for latest linting rules
+- **Updated Dependencies**: Kept flutter_lints at ^5.0.0 for broader SDK compatibility
 - **Documentation**: 
   - Updated README files and fixed repository URLs
   - Removed outdated build error note about isInspectable vs debuggingEnabled
