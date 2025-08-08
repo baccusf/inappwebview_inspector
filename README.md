@@ -564,7 +564,7 @@ This project demonstrates the power of **AI-assisted development** using Claude 
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/inappwebview_inspector.git
+git clone https://github.com/baccusf/inappwebview_inspector.git
 cd inappwebview_inspector
 
 # Install dependencies  
@@ -590,15 +590,15 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 Support & Community
 
-- **🐛 Issues**: [Report bugs and issues](https://github.com/your-username/inappwebview_inspector/issues)
-- **💡 Features**: [Request new features](https://github.com/your-username/inappwebview_inspector/issues/new?template=feature_request.md)  
+- **🐛 Issues**: [Report bugs and issues](https://github.com/baccusf/inappwebview_inspector/issues)
+- **💡 Features**: [Request new features](https://github.com/baccusf/inappwebview_inspector/issues/new?template=feature_request.md)  
 - **📖 Documentation**: Check the comprehensive [CLAUDE.md](CLAUDE.md) for development guidance
-- **💬 Discussions**: [Join community discussions](https://github.com/your-username/inappwebview_inspector/discussions)
+- **💬 Discussions**: [Join community discussions](https://github.com/baccusf/inappwebview_inspector/discussions)
 
 ## 🔗 Related Links
 
 - **📦 pub.dev**: [Package on pub.dev](https://pub.dev/packages/inappwebview_inspector)
-- **🌐 Repository**: [GitHub Repository](https://github.com/your-username/inappwebview_inspector)
+- **🌐 Repository**: [GitHub Repository](https://github.com/baccusf/inappwebview_inspector)
 - **📚 flutter_inappwebview**: [Core WebView package](https://pub.dev/packages/flutter_inappwebview)
 - **🤖 Claude**: [Learn more about Claude AI](https://claude.ai)
 

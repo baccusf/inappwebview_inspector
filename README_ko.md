@@ -389,15 +389,15 @@ MaterialApp(
 
 ## 📞 지원 및 커뮤니티
 
-- **🐛 이슈**: [버그 및 이슈 보고](https://github.com/your-username/inappwebview_inspector/issues)
-- **💡 기능**: [새로운 기능 요청](https://github.com/your-username/inappwebview_inspector/issues/new?template=feature_request.md)  
+- **🐛 이슈**: [버그 및 이슈 보고](https://github.com/baccusf/inappwebview_inspector/issues)
+- **💡 기능**: [새로운 기능 요청](https://github.com/baccusf/inappwebview_inspector/issues/new?template=feature_request.md)  
 - **📖 문서**: 개발 가이드는 포괄적인 [CLAUDE.md](CLAUDE.md)를 확인하세요
-- **💬 토론**: [커뮤니티 토론에 참여](https://github.com/your-username/inappwebview_inspector/discussions)
+- **💬 토론**: [커뮤니티 토론에 참여](https://github.com/baccusf/inappwebview_inspector/discussions)
 
 ## 🔗 관련 링크
 
 - **📦 pub.dev**: [pub.dev의 패키지](https://pub.dev/packages/inappwebview_inspector)
-- **🌐 저장소**: [GitHub 저장소](https://github.com/your-username/inappwebview_inspector)
+- **🌐 저장소**: [GitHub 저장소](https://github.com/baccusf/inappwebview_inspector)
 - **📚 flutter_inappwebview**: [핵심 WebView 패키지](https://pub.dev/packages/flutter_inappwebview)
 - **🤖 Claude**: [Claude AI에 대해 자세히 알아보기](https://claude.ai)
 

@@ -389,15 +389,15 @@ MaterialApp(
 
 ## 📞 サポート・コミュニティ
 
-- **🐛 イシュー**: [バグ・問題の報告](https://github.com/your-username/inappwebview_inspector/issues)
-- **💡 機能**: [新機能のリクエスト](https://github.com/your-username/inappwebview_inspector/issues/new?template=feature_request.md)  
+- **🐛 イシュー**: [バグ・問題の報告](https://github.com/baccusf/inappwebview_inspector/issues)
+- **💡 機能**: [新機能のリクエスト](https://github.com/baccusf/inappwebview_inspector/issues/new?template=feature_request.md)  
 - **📖 ドキュメント**: 開発ガイドは包括的な[CLAUDE.md](CLAUDE.md)をご確認ください
-- **💬 ディスカッション**: [コミュニティディスカッションに参加](https://github.com/your-username/inappwebview_inspector/discussions)
+- **💬 ディスカッション**: [コミュニティディスカッションに参加](https://github.com/baccusf/inappwebview_inspector/discussions)
 
 ## 🔗 関連リンク
 
 - **📦 pub.dev**: [pub.devのパッケージ](https://pub.dev/packages/inappwebview_inspector)
-- **🌐 リポジトリ**: [GitHubリポジトリ](https://github.com/your-username/inappwebview_inspector)
+- **🌐 リポジトリ**: [GitHubリポジトリ](https://github.com/baccusf/inappwebview_inspector)
 - **📚 flutter_inappwebview**: [コアWebViewパッケージ](https://pub.dev/packages/flutter_inappwebview)
 - **🤖 Claude**: [Claude AIについて詳しく](https://claude.ai)
 
