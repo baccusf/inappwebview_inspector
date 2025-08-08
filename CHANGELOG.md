@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.2] - 2025-08-08
+
+### 🔧 Improvements
+- **pub.dev Package Score**: Improved package metadata and formatting
+  - Fixed package description length (199+ → 142 characters for better SEO)
+  - Fixed GitHub issue tracker URL typo (baccusff → baccusf)
+  - Applied Dart formatting to all source files for consistent code style
+- **Documentation**: Added solution for git-sourced flutter_inappwebview dependency conflicts
+  - Added dependency_overrides examples in all README files (English, Korean, Japanese)
+  - Resolved common user integration issues with clear step-by-step instructions
+
+### 🐛 Bug Fixes
+- **Package Validation**: All pub.dev validation checks now pass
+- **Static Analysis**: Applied consistent Dart formatting across all files
+
 ## [0.1.1] - 2025-08-08
 
 ### 🔧 Improvements

@@ -348,6 +348,25 @@ MaterialApp(
 
 1. **"No Overlay widget found"**: 검사기 위젯을 MaterialApp.builder에서 Scaffold Stack 내부로 이동
 2. **검사기가 표시되지 않음**: WebView를 등록한 후 `InAppWebViewInspector.enable()`이 호출되었는지 확인
+3. **git 소스 flutter_inappwebview와 의존성 충돌**: dependency override 추가
+
+앱에서 flutter_inappwebview를 git 소스로 사용하는 경우:
+```yaml
+dependencies:
+  inappwebview_inspector: ^0.1.1
+  flutter_inappwebview:
+    git:
+      url: https://github.com/pichillilorenzo/flutter_inappwebview.git
+      ref: master
+      path: flutter_inappwebview
+
+dependency_overrides:
+  flutter_inappwebview:
+    git:
+      url: https://github.com/pichillilorenzo/flutter_inappwebview.git
+      ref: master
+      path: flutter_inappwebview
+```
 
 ## 📋 요구사항
 
