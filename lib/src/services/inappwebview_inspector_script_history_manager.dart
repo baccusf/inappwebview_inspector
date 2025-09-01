@@ -87,7 +87,9 @@ class InAppWebViewInspectorScriptHistoryManager {
 
   /// Add script to history
   void addScript(String script) {
-    if (script.trim().isEmpty) return;
+    if (script.trim().isEmpty) {
+      return;
+    }
 
     final trimmedScript = script.trim();
 
@@ -132,7 +134,9 @@ class InAppWebViewInspectorScriptHistoryManager {
 
   /// Search scripts (partial match)
   List<InAppWebViewInspectorScriptHistory> searchScripts(String query) {
-    if (query.trim().isEmpty) return history;
+    if (query.trim().isEmpty) {
+      return history;
+    }
 
     final lowercaseQuery = query.toLowerCase();
     return _history
