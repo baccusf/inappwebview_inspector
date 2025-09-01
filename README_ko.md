@@ -13,6 +13,14 @@
 
 ## ✨ 주요 기능
 
+### 🚀 **제로 셋업 자동 UI 주입** *(새로운 기능!)*
+- **수동 위젯 배치 불필요**: `show()` 호출 시 Inspector UI가 자동으로 오버레이로 주입됩니다
+- **스마트 컨텍스트 발견**: WidgetsBinding과 NavigatorKey 폴백을 통한 자동 BuildContext 발견
+- **개발자 제어**: 사용자가 디버그 모드 초기화를 통해 자동 주입 활성화를 제어합니다
+- **핫 리로드 호환**: Flutter의 핫 리로드와 원활하게 작동하는 견고한 오버레이 시스템
+- **성능 최적화**: 즉시 컨텍스트 액세스를 위한 선택적 NavigatorKey 통합
+- **제로 설정**: `toggle()`만 호출하면 UI가 나타남 - Stack 위젯이나 수동 배치 불필요
+
 ### 🖥️ **실시간 콘솔 모니터링**
 - **라이브 콘솔 출력**: 모든 JavaScript 콘솔 메시지(`log`, `warn`, `error`, `debug`)를 실시간으로 모니터링
 - **색상 구분 메시지**: 로그 레벨에 따른 색상 구분으로 쉬운 식별 가능
@@ -79,29 +87,48 @@ $ flutter pub get
 `main()` 함수에 다음을 추가하세요:
 
 ```dart
+import 'package:flutter/foundation.dart';
 import 'package:inappwebview_inspector/inappwebview_inspector.dart';
 
 void main() {
-  // 향상된 기능으로 개발용 초기화
-  InAppWebViewInspector.initializeDevelopment(
-    enableScriptHistory: true,
-    maxScriptHistoryCount: 25,
-    localizations: InAppWebViewInspectorLocalizations.korean, // 필요에 따라 변경
-    onScriptExecuted: (script, webViewId) {
-      print('$webViewId에서 실행됨: $script');
-    },
-    onConsoleLog: (log) {
-      print('콘솔 [${log.levelText}]: ${log.message}');
-    },
-  );
+  // 제로 셋업 초기화 - show()가 자동으로 UI를 주입합니다
+  if (kDebugMode) {
+    InAppWebViewInspector.initializeDevelopment(
+      enableScriptHistory: true,
+      maxScriptHistoryCount: 25,
+      localizations: InAppWebViewInspectorLocalizations.korean, // 필요에 따라 변경
+      onScriptExecuted: (script, webViewId) {
+        print('$webViewId에서 실행됨: $script');
+      },
+      onConsoleLog: (log) {
+        print('콘솔 [${log.levelText}]: ${log.message}');
+      },
+    );
+  }
   
   runApp(MyApp());
 }
 ```
 
-### 2. 앱에 검사기 위젯 추가
+### 2. 최적 성능을 위한 NavigatorKey 추가 (권장)
 
-**⚠️ 중요**: 검사기 위젯은 `Scaffold` 본문 내의 `Stack` 안에 배치되어야 합니다:
+```dart
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'WebView Inspector 데모',
+      // 최적의 자동 UI 주입 성능을 위한 navigatorKey 추가
+      navigatorKey: InAppWebViewInspector.navigatorKey,
+      home: MyWebViewPage(),
+    );
+  }
+}
+```
+
+### 3. 간단한 WebView 설정 - 제로 수동 UI 배치
+
+**✨ 새로운 기능: 제로 셋업 자동 UI 주입** - UI에 수동으로 위젯을 추가할 필요가 없습니다!
 
 ```dart
 import 'package:flutter/material.dart';
@@ -131,48 +158,48 @@ class _MyWebViewPageState extends State<MyWebViewPage> {
           ),
         ],
       ),
-      body: Stack(  // ⚠️ 여기서 Stack 사용 필수
+      // ✨ Stack이 필요하지 않습니다! Inspector UI가 오버레이로 자동 주입됩니다
+      body: Column(
         children: [
-          // 메인 WebView
-          InAppWebView(
-            initialUrlRequest: URLRequest(
-              url: WebUri('https://flutter.dev'),
-            ),
-            onWebViewCreated: (controller) {
-              webViewController = controller;
-              
-              // 검사기에 WebView 등록
-              InAppWebViewInspector.registerWebView(
-                webViewId,
-                controller,
-                'https://flutter.dev',
-              );
-            },
-            onLoadStop: (controller, url) {
-              // 내비게이션이 발생할 때 검사기에서 URL 업데이트
-              if (url != null) {
-                InAppWebViewInspector.updateWebViewUrl(
+          // 메인 WebView - show() 호출 시 Inspector UI가 자동 주입됩니다
+          Expanded(
+            child: InAppWebView(
+              initialUrlRequest: URLRequest(
+                url: WebUri('https://flutter.dev'),
+              ),
+              onWebViewCreated: (controller) {
+                webViewController = controller;
+                
+                // 검사기에 WebView 등록
+                InAppWebViewInspector.registerWebView(
                   webViewId,
-                  url.toString(),
+                  controller,
+                  'https://flutter.dev',
                 );
-              }
-            },
-            onConsoleMessage: (controller, consoleMessage) {
-              // 콘솔 메시지를 검사기로 전달
-              InAppWebViewInspector.addConsoleLog(
-                webViewId,
-                consoleMessage,
-              );
-            },
-            initialSettings: InAppWebViewSettings(
-              isInspectable: true, // 디버깅 활성화
-              javaScriptEnabled: true,
-              domStorageEnabled: true,
+              },
+              onLoadStop: (controller, url) {
+                // 내비게이션이 발생할 때 검사기에서 URL 업데이트
+                if (url != null) {
+                  InAppWebViewInspector.updateWebViewUrl(
+                    webViewId,
+                    url.toString(),
+                  );
+                }
+              },
+              onConsoleMessage: (controller, consoleMessage) {
+                // 콘솔 메시지를 검사기로 전달
+                InAppWebViewInspector.addConsoleLog(
+                  webViewId,
+                  consoleMessage,
+                );
+              },
+              initialSettings: InAppWebViewSettings(
+                isInspectable: true, // 디버깅 활성화
+                javaScriptEnabled: true,
+                domStorageEnabled: true,
+              ),
             ),
           ),
-          
-          // 검사기 오버레이 위젯 - Stack 내부에 있어야 함
-          const InAppWebViewInspectorWidget(),
         ],
       ),
     );
@@ -187,13 +214,13 @@ class _MyWebViewPageState extends State<MyWebViewPage> {
 }
 ```
 
-### 3. 검사기 가시성 제어
+### 4. 검사기 가시성 제어
 
 ```dart
-// 검사기 표시/숨기기
-InAppWebViewInspector.show();
-InAppWebViewInspector.hide();
-InAppWebViewInspector.toggle();
+// 검사기 표시/숨기기 - UI가 자동으로 오버레이로 주입됩니다!
+InAppWebViewInspector.show();    // ✨ UI 오버레이를 자동 주입
+InAppWebViewInspector.hide();    // 오버레이 제거
+InAppWebViewInspector.toggle();  // ✨ 자동 주입으로 토글
 
 // 검사기 활성화/비활성화
 InAppWebViewInspector.enable();
@@ -209,60 +236,69 @@ bool isEnabled = InAppWebViewInspector.isEnabled;
 ### 개발 모드 (디버그 빌드 권장)
 
 ```dart
-InAppWebViewInspector.initializeDevelopment(
-  enableScriptHistory: true,
-  maxScriptHistoryCount: 25,
-  maxConsoleLogCount: 500,
-  localizations: InAppWebViewInspectorLocalizations.korean,
-  onScriptExecuted: (script, webViewId) {
-    print('$webViewId에서 스크립트 실행됨: $script');
-  },
-  onConsoleLog: (log) {
-    print('콘솔 [${log.levelText}]: ${log.message}');
-  },
-);
+// 제로 셋업 - show()가 항상 UI를 자동 주입합니다
+if (kDebugMode) {
+  InAppWebViewInspector.initializeDevelopment(
+    enableScriptHistory: true,
+    maxScriptHistoryCount: 25,
+    maxConsoleLogCount: 500,
+    localizations: InAppWebViewInspectorLocalizations.korean,
+    onScriptExecuted: (script, webViewId) {
+      print('$webViewId에서 스크립트 실행됨: $script');
+    },
+    onConsoleLog: (log) {
+      print('콘솔 [${log.levelText}]: ${log.message}');
+    },
+  );
+}
 ```
 
 ### 프로덕션 모드 (최소 영향)
 
 ```dart
-InAppWebViewInspector.initializeProduction(
-  maxConsoleLogCount: 50,
-  enableAutoResultLogging: false,
-  enableScriptHistory: false,
-  localizations: InAppWebViewInspectorLocalizations.korean,
-);
+// 필요한 경우에만 프로덕션에서 초기화
+if (!kReleaseMode) {
+  InAppWebViewInspector.initializeProduction(
+    maxConsoleLogCount: 50,
+    enableAutoResultLogging: false,
+    enableScriptHistory: false,
+    localizations: InAppWebViewInspectorLocalizations.korean,
+  );
+}
 ```
 
 ### 고급 사용자 정의 구성
 
 ```dart
-InAppWebViewInspector.initializeWithConfig(
-  InAppWebViewInspectorConfig(
-    debugMode: true,
-    maxConsoleLogCount: 1000,
-    enableAutoResultLogging: true,
-    enableUnicodeQuoteNormalization: true,
-    enableBase64ScriptEncoding: true,
-    enableScriptHistory: true,
-    maxScriptHistoryCount: 30,
-    localizations: InAppWebViewInspectorLocalizations.korean, // 다국어 지원
-    onScriptExecuted: (script, webViewId) {
-      // 사용자 정의 스크립트 실행 콜백
-      analytics.logEvent('script_executed', {'webview_id': webViewId});
-    },
-    onConsoleLog: (log) {
-      // 사용자 정의 콘솔 로깅
-      if (log.level == ConsoleMessageLevel.ERROR) {
-        crashlytics.recordError(log.message, null);
-      }
-    },
-    onError: (error, webViewId) {
-      // 오류 처리 콜백
-      print('$webViewId에서 검사기 오류: $error');
-    },
-  ),
-);
+// 자동 UI 주입이 포함된 고급 구성
+if (kDebugMode) {
+  InAppWebViewInspector.initializeWithConfig(
+    InAppWebViewInspectorConfig(
+      debugMode: true,
+      maxConsoleLogCount: 1000,
+      enableAutoResultLogging: true,
+      enableUnicodeQuoteNormalization: true,
+      enableBase64ScriptEncoding: true,
+      enableScriptHistory: true,
+      maxScriptHistoryCount: 30,
+      localizations: InAppWebViewInspectorLocalizations.korean, // 다국어 지원
+      onScriptExecuted: (script, webViewId) {
+        // 사용자 정의 스크립트 실행 콜백
+        analytics.logEvent('script_executed', {'webview_id': webViewId});
+      },
+      onConsoleLog: (log) {
+        // 사용자 정의 콘솔 로깅
+        if (log.level == ConsoleMessageLevel.ERROR) {
+          crashlytics.recordError(log.message, null);
+        }
+      },
+      onError: (error, webViewId) {
+        // 오류 처리 콜백
+        print('$webViewId에서 검사기 오류: $error');
+      },
+    ),
+  );
+}
 ```
 
 ## 🛠️ 사전 로드된 유틸리티 스크립트
@@ -316,29 +352,48 @@ InAppWebViewInspector.initializeWithConfig(
 
 ## ⚠️ 중요한 구현 참고사항
 
-### 위젯 배치 요구사항
+### ✨ 제로 셋업 자동 UI 주입
 
-`InAppWebViewInspectorWidget`은 런타임 오류를 방지하기 위해 올바르게 배치되어야 합니다:
+**새로운 간소화된 접근법**: 수동 위젯 배치가 필요하지 않습니다!
 
-✅ **올바름**: Scaffold 본문 Stack 내부
+✅ **새로운 제로 셋업 방법**: 자동 UI 주입 (권장)
+```dart
+// 1. 최적 성능을 위한 NavigatorKey 추가
+MaterialApp(
+  navigatorKey: InAppWebViewInspector.navigatorKey, // ✅ 최적 설정
+  home: MyWebViewPage(),
+)
+
+// 2. Stack이 필요하지 않은 간단한 UI
+Scaffold(
+  body: Column(  // ✅ 간단한 레이아웃
+    children: [
+      Expanded(
+        child: InAppWebView(
+          // WebView 등록하면 inspector가 UI를 자동 주입
+          onWebViewCreated: (controller) {
+            InAppWebViewInspector.registerWebView('main', controller, url);
+          },
+        ),
+      ),
+    ],
+  ),
+)
+
+// 3. Inspector 토글 - UI가 오버레이로 자동 나타남!
+InAppWebViewInspector.toggle(); // ✅ 제로 수동 UI 작업
+```
+
+### 레거시 수동 위젯 배치 (여전히 지원됨)
+
+고급 사용 사례의 경우 여전히 위젯을 수동으로 배치할 수 있습니다:
+
 ```dart
 Scaffold(
   body: Stack(
     children: [
       YourMainContent(),
-      const InAppWebViewInspectorWidget(), // ✅ 올바른 배치
-    ],
-  ),
-)
-```
-
-❌ **잘못됨**: MaterialApp 빌더 내부  
-```dart
-MaterialApp(
-  builder: (context, child) => Stack(
-    children: [
-      child!,
-      const InAppWebViewInspectorWidget(), // ❌ 오버레이 오류 발생
+      const InAppWebViewInspectorWidget(), // 수동 배치
     ],
   ),
 )
@@ -346,9 +401,10 @@ MaterialApp(
 
 ### 일반적인 문제 및 해결책
 
-1. **"No Overlay widget found"**: 검사기 위젯을 MaterialApp.builder에서 Scaffold Stack 내부로 이동
-2. **검사기가 표시되지 않음**: WebView를 등록한 후 `InAppWebViewInspector.enable()`이 호출되었는지 확인
-3. **git 소스 flutter_inappwebview와 의존성 충돌**: dependency override 추가
+1. **검사기가 나타나지 않음**: 최적의 컨텍스트 발견을 위해 MaterialApp에 NavigatorKey가 추가되었는지 확인
+2. **자동 UI 주입 실패**: 디버그 모드에 있고 inspector가 제대로 초기화되었는지 확인
+3. **"No Overlay widget found"**: MaterialApp에 `navigatorKey: InAppWebViewInspector.navigatorKey` 추가
+4. **git 소스 flutter_inappwebview와 의존성 충돌**: dependency override 추가
 
 앱에서 flutter_inappwebview를 git 소스로 사용하는 경우:
 ```yaml

@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'inappwebview_inspector_interface.dart';
 import '../utils/inappwebview_inspector_script_utils.dart';
+import '../ui/inappwebview_inspector_overlay_manager.dart';
 
 /// Concrete implementation of WebView inspection
 class InAppWebViewInspectorImpl implements InAppWebViewInspectorInterface {
@@ -355,20 +356,32 @@ class InAppWebViewInspectorImpl implements InAppWebViewInspectorInterface {
 
   @override
   void toggleInspectorVisibility() {
-    _isInspectorVisible = !_isInspectorVisible;
-    _visibilityController.add(_isInspectorVisible);
+    if (_isInspectorVisible) {
+      hideInspector();
+    } else {
+      showInspector();
+    }
   }
 
   @override
   void showInspector() {
     _isInspectorVisible = true;
     _visibilityController.add(_isInspectorVisible);
+    
+    // Auto-inject UI using overlay manager
+    InAppWebViewInspectorOverlayManager.showInspector(
+      inspector: this,
+      config: _config,
+    );
   }
 
   @override
   void hideInspector() {
     _isInspectorVisible = false;
     _visibilityController.add(_isInspectorVisible);
+    
+    // Hide overlay UI
+    InAppWebViewInspectorOverlayManager.hideInspector();
   }
 
   @override
@@ -383,6 +396,9 @@ class InAppWebViewInspectorImpl implements InAppWebViewInspectorInterface {
     _isInspectorVisible = false;
     _enabledController.add(_isInspectorEnabled);
     _visibilityController.add(_isInspectorVisible);
+    
+    // Hide overlay UI when disabling
+    InAppWebViewInspectorOverlayManager.hideInspector();
   }
 
   @override
@@ -397,6 +413,9 @@ class InAppWebViewInspectorImpl implements InAppWebViewInspectorInterface {
 
   @override
   void dispose() {
+    // Clean up overlay UI
+    InAppWebViewInspectorOverlayManager.dispose();
+    
     _consoleLogsController.close();
     _activeWebViewController.close();
     _visibilityController.close();
