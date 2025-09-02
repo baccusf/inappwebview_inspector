@@ -657,46 +657,68 @@ class _InAppWebViewInspectorWidgetState
               maxLines: 1,
             ),
           ),
-          IconButton(
-            onPressed: () => _toggleToMinimalMode(),
-            icon: const Icon(
-              Icons.minimize,
-              color: Colors.white,
-              size: 16,
-            ),
-            tooltip: '최소화',
-          ),
-          IconButton(
-            onPressed: () => _setSizeMode(_SizeMode.medium),
-            icon: Icon(
-              Icons.crop_square,
-              color: _sizeMode == _SizeMode.medium ? Colors.blue : Colors.white,
-              size: 16,
-            ),
-            tooltip: '중간',
-          ),
-          IconButton(
-            onPressed: () => _setSizeMode(_SizeMode.maximized),
-            icon: Icon(
-              Icons.maximize,
-              color:
-                  _sizeMode == _SizeMode.maximized ? Colors.blue : Colors.white,
-              size: 16,
-            ),
-            tooltip: '최대',
-          ),
-          IconButton(
-            onPressed: () {
-              _inspector.hideInspector();
-            },
-            icon: const Icon(
-              Icons.close,
-              color: Colors.white,
-              size: 18,
-            ),
-            tooltip: '모니터 숨기기',
+          // Compact button group with reduced spacing
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _buildHeaderButton(
+                onPressed: () => _toggleToMinimalMode(),
+                icon: Icons.minimize,
+                color: Colors.white,
+                size: 16,
+                tooltip: '최소화',
+              ),
+              _buildHeaderButton(
+                onPressed: () => _setSizeMode(_SizeMode.medium),
+                icon: Icons.crop_square,
+                color: _sizeMode == _SizeMode.medium ? Colors.blue : Colors.white,
+                size: 16,
+                tooltip: '중간',
+              ),
+              _buildHeaderButton(
+                onPressed: () => _setSizeMode(_SizeMode.maximized),
+                icon: Icons.maximize,
+                color: _sizeMode == _SizeMode.maximized ? Colors.blue : Colors.white,
+                size: 16,
+                tooltip: '최대',
+              ),
+              _buildHeaderButton(
+                onPressed: () {
+                  _inspector.hideInspector();
+                },
+                icon: Icons.close,
+                color: Colors.white,
+                size: 18,
+                tooltip: '모니터 숨기기',
+              ),
+            ],
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildHeaderButton({
+    required VoidCallback onPressed,
+    required IconData icon,
+    required Color color,
+    required double size,
+    required String tooltip,
+  }) {
+    return SizedBox(
+      width: 32,
+      height: 32,
+      child: IconButton(
+        onPressed: onPressed,
+        icon: Icon(
+          icon,
+          color: color,
+          size: size,
+        ),
+        tooltip: tooltip,
+        padding: EdgeInsets.zero,
+        constraints: const BoxConstraints(),
+        splashRadius: 16,
       ),
     );
   }
@@ -1227,22 +1249,21 @@ class _InAppWebViewInspectorWidgetState
                   _isDragging = false;
                 });
               },
-              child: Material(
-                elevation: 8,
-                borderRadius: BorderRadius.circular(6),
-                child: Container(
-                  width: _size.width,
-                  height: _size.height,
-                  decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: 0.9),
-                    borderRadius: BorderRadius.circular(6),
-                    border: Border.all(color: Colors.grey.shade600),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      // WebView icon with status indicator
-                      Stack(
+              child: GestureDetector(
+                onTap: _restoreFromMinimalMode,
+                child: Material(
+                  elevation: 8,
+                  borderRadius: BorderRadius.circular(6),
+                  child: Container(
+                    width: _size.width,
+                    height: _size.height,
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: 0.9),
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(color: Colors.grey.shade600),
+                    ),
+                    child: Center(
+                      child: Stack(
                         children: [
                           const Icon(
                             Icons.web,
@@ -1281,23 +1302,7 @@ class _InAppWebViewInspectorWidgetState
                             ),
                         ],
                       ),
-                      // Expand button
-                      GestureDetector(
-                        onTap: _restoreFromMinimalMode,
-                        child: Container(
-                          padding: const EdgeInsets.all(2),
-                          decoration: BoxDecoration(
-                            color: Colors.grey.withValues(alpha: 0.3),
-                            borderRadius: BorderRadius.circular(3),
-                          ),
-                          child: const Icon(
-                            Icons.preview, // This corresponds to the "preview" icon
-                            color: Colors.white,
-                            size: 16,
-                          ),
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
                 ),
               ),
