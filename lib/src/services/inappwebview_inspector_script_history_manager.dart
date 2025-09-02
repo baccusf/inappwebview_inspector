@@ -71,8 +71,9 @@ class InAppWebViewInspectorScriptHistoryManager {
   void _sortHistory() {
     _history.sort((a, b) {
       final usageComparison = b.usageCount.compareTo(a.usageCount);
-      if (usageComparison != InAppWebViewInspectorConstants.compareEqual)
+      if (usageComparison != InAppWebViewInspectorConstants.compareEqual) {
         return usageComparison;
+      }
       return b.timestamp.compareTo(a.timestamp);
     });
   }
