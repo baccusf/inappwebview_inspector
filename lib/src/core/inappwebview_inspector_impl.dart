@@ -165,7 +165,9 @@ class InAppWebViewInspectorImpl implements InAppWebViewInspectorInterface {
   @override
   Future<void> executeScript(String script) async {
     final activeWebView = _webViews[_activeWebViewId];
-    if (activeWebView == null) return;
+    if (activeWebView == null) {
+      return;
+    }
 
     try {
       String normalizedScript = script;

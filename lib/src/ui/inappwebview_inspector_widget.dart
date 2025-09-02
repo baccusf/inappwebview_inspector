@@ -278,7 +278,9 @@ class _InAppWebViewInspectorWidgetState
 
   void _measureAndUpdateInputFieldHeight() {
     final renderBox = _getInputFieldRenderBox();
-    if (renderBox == null) return;
+    if (renderBox == null) {
+      return;
+    }
 
     final newHeight = renderBox.size.height;
     if (_isInputFieldHeightChanged(newHeight)) {
@@ -321,7 +323,9 @@ class _InAppWebViewInspectorWidgetState
   }
 
   void _showHistoryPopup() {
-    if (_isHistoryPopupOpen) return;
+    if (_isHistoryPopupOpen) {
+      return;
+    }
 
     final history = _historyController?.history ?? _scriptHistory;
     setState(() {
@@ -748,7 +752,9 @@ class _InAppWebViewInspectorWidgetState
   }
 
   void _showCustomDropdown() {
-    if (_isDropdownOpen || _webViews.isEmpty) return;
+    if (_isDropdownOpen || _webViews.isEmpty) {
+      return;
+    }
 
     setState(() {
       _isDropdownOpen = true;
