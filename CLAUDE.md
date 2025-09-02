@@ -235,7 +235,26 @@ The package supports Android and iOS platforms:
 
 ## Recent Development History
 
+### Pub.dev Linting Compliance (2025-09-02)
 
+**Code Quality Improvements:**
+1. **Lint Rule Compliance**:
+   - **Curly Braces**: Added missing curly braces to all if statements across the codebase for pub.dev linting compliance
+   - **Analysis Options**: Updated `analysis_options.yaml` with stricter linting rules for consistent code style
+   - **Code Style**: Applied consistent formatting and linting rules throughout the package
+
+2. **Files Updated for Linting**:
+   - ✅ `lib/src/core/inappwebview_inspector_impl.dart` - Added curly braces to conditional statements
+   - ✅ `lib/src/services/inappwebview_inspector_script_history.dart` - Fixed if statement formatting
+   - ✅ `lib/src/services/inappwebview_inspector_script_history_manager.dart` - Applied linting fixes
+   - ✅ `lib/src/ui/inappwebview_inspector_widget.dart` - Consistent code style improvements
+   - ✅ `lib/src/utils/inappwebview_inspector_script_utils.dart` - Added required curly braces
+   - ✅ `analysis_options.yaml` - Updated with comprehensive linting rules
+
+3. **Quality Standards**:
+   - **Pub.dev Score**: All linting requirements now pass for improved package score
+   - **Code Consistency**: Uniform code style across all source files
+   - **Maintainability**: Better code readability and consistency for future development
 
 ### Package Development Phase (2025-08-08)
 
@@ -350,7 +369,7 @@ MaterialApp(
 ```bash
 # Must use fvm for consistency
 fvm flutter pub get
-fvm flutter analyze
+fvm flutter analyze   # Must pass with no linting errors
 fvm flutter test
 fvm flutter build ios --simulator
 fvm flutter run
@@ -358,3 +377,31 @@ fvm flutter run
 # Do not use regular flutter commands
 # flutter pub get  # ❌ 
 ```
+
+## Code Quality Standards
+
+### Lint Rule Compliance
+This package follows strict linting rules for pub.dev compliance and code quality:
+
+1. **Required Curly Braces**: All if statements must include curly braces, even for single-line statements
+   ```dart
+   // ✅ Correct - with curly braces
+   if (condition) {
+     doSomething();
+   }
+   
+   // ❌ Incorrect - missing curly braces
+   if (condition) doSomething();
+   ```
+
+2. **Analysis Requirements**: 
+   - `fvm flutter analyze` must pass with zero warnings/errors
+   - All pub.dev package validation checks must pass
+   - Consistent code formatting across all files
+
+3. **Quality Checklist**:
+   - ✅ No lint warnings or errors
+   - ✅ Consistent code style and formatting
+   - ✅ All if statements have curly braces
+   - ✅ Proper documentation and comments
+   - ✅ Pass pub.dev package validation
