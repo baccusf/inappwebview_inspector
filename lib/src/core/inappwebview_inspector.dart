@@ -1,9 +1,16 @@
+import 'package:flutter/material.dart';
 import 'inappwebview_inspector_interface.dart';
 import 'inappwebview_inspector_factory.dart';
 import '../utils/inappwebview_inspector_localizations.dart';
+import '../ui/inappwebview_inspector_overlay_manager.dart';
 
 /// Main WebView Inspector class - Convenience class for quick setup
 class InAppWebViewInspector {
+  /// NavigatorKey for optimal context access (optional but recommended)
+  static final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
+  
+  /// Get NavigatorKey for MaterialApp
+  static GlobalKey<NavigatorState> get navigatorKey => _navigatorKey;
   /// Initialize WebView inspection with default configuration
   static void initialize({
     bool debugMode = false,
@@ -34,6 +41,9 @@ class InAppWebViewInspector {
     InAppWebViewInspectorFactory.initialize(config: config);
     InAppWebViewInspectorService.register(
         InAppWebViewInspectorFactory.getInstance());
+    
+    // Register NavigatorKey for optimal context access
+    InAppWebViewInspectorOverlayManager.registerNavigatorKey(_navigatorKey);
   }
 
   /// Initialize with custom configuration
@@ -41,6 +51,9 @@ class InAppWebViewInspector {
     InAppWebViewInspectorFactory.initialize(config: config);
     InAppWebViewInspectorService.register(
         InAppWebViewInspectorFactory.getInstance());
+    
+    // Register NavigatorKey for optimal context access
+    InAppWebViewInspectorOverlayManager.registerNavigatorKey(_navigatorKey);
   }
 
   /// Initialize with development mode (shortcut for common use case)

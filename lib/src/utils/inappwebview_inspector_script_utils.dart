@@ -67,7 +67,9 @@ class InAppWebViewInspectorScriptUtils {
 
   /// Get suggestions for handling unsupported type
   static List<String> getSuggestions(String? unsupportedType) {
-    if (unsupportedType == null) return [];
+    if (unsupportedType == null) {
+      return [];
+    }
     return typeSuggestions[unsupportedType] ?? [];
   }
 
@@ -135,7 +137,9 @@ class InAppWebViewInspectorScriptUtils {
         (function() {
           try {
             const element = $trimmedScript;
-            if (!element) return null;
+            if (!element) {
+              return null;
+            }
             return {
               tagName: element.tagName,
               textContent: element.textContent?.trim() || '',

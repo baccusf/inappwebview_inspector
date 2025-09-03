@@ -1,18 +1,18 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:inappwebview_inspector/inappwebview_inspector.dart';
 
 void main() {
-  // Initialize the WebView Inspector in development mode with enhanced script history
-  // Test with English (default) localization - change to test other languages:
-  // InAppWebViewInspectorLocalizations.korean, InAppWebViewInspectorLocalizations.japanese, etc.
-  InAppWebViewInspector.initializeDevelopment(
-    enableScriptHistory: true,
-    maxScriptHistoryCount: 25, // Allow more scripts in history
-    localizations: InAppWebViewInspectorLocalizations
-        .english, // Change this to test other languages
-    // Removed debug callbacks for production-ready example
-  );
+  // Simple initialization - show() will always auto-inject UI
+  if (kDebugMode) {
+    InAppWebViewInspector.initializeDevelopment(
+      enableScriptHistory: true,
+      maxScriptHistoryCount: 25, // Allow more scripts in history
+      localizations: InAppWebViewInspectorLocalizations
+          .english, // Change this to test other languages
+    );
+  }
 
   runApp(const MyApp());
 }
@@ -23,7 +23,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'WebView Inspector Demo - Memory-based Script History',
+      title: 'WebView Inspector Demo - Zero Setup Auto UI Injection',
+      // Optional: Add navigatorKey for optimal performance
+      navigatorKey: InAppWebViewInspector.navigatorKey,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
@@ -65,7 +67,7 @@ class _WebViewExampleState extends State<WebViewExample> {
           children: [
             Text('WebView Inspector Demo'),
             Text(
-              'Memory-based Script History with 15+ Pre-loaded Scripts',
+              'Simple Auto UI Injection Demo',
               style: TextStyle(fontSize: 12, fontWeight: FontWeight.normal),
             ),
           ],
@@ -74,7 +76,7 @@ class _WebViewExampleState extends State<WebViewExample> {
           IconButton(
             icon: const Icon(Icons.bug_report),
             onPressed: InAppWebViewInspector.toggle,
-            tooltip: 'Toggle Inspector\n(Shows pre-loaded useful scripts)',
+            tooltip: 'Toggle Inspector\n(Zero Setup - UI Auto-Injected!)',
           ),
           IconButton(
             icon: const Icon(Icons.info_outline),
@@ -83,92 +85,86 @@ class _WebViewExampleState extends State<WebViewExample> {
           ),
         ],
       ),
-      body: Stack(
+      body: Column(
         children: [
-          Column(
-            children: [
-              // URL selector
-              Container(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  children: [
-                    const Text('URL: '),
-                    Expanded(
-                      child: DropdownButton<String>(
-                        value: _currentUrl,
-                        isExpanded: true,
-                        items: _testUrls.map((url) {
-                          return DropdownMenuItem(
-                            value: url,
-                            child: Text(url),
-                          );
-                        }).toList(),
-                        onChanged: (String? newUrl) {
-                          if (newUrl != null) {
-                            setState(() {
-                              _currentUrl = newUrl;
-                            });
-                            _webViewController?.loadUrl(
-                              urlRequest: URLRequest(url: WebUri(newUrl)),
-                            );
-                          }
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 8),
-              // WebView (without overlay - now handled globally)
-              Expanded(
-                child: InAppWebView(
-                  initialUrlRequest: URLRequest(url: WebUri(_currentUrl)),
-                  onWebViewCreated: (controller) {
-                    _webViewController = controller;
-
-                    // Register this WebView with the inspector using a descriptive identifier
-                    // This automatically enables the inspector and makes the WebView visible
-                    InAppWebViewInspector.registerWebView(
-                        _webViewId, controller, _currentUrl);
-                  },
-                  onLoadStop: (controller, url) {
-                    if (url != null) {
-                      final urlString = url.toString();
-
-                      // Update URL in inspector
-                      InAppWebViewInspector.updateWebViewUrl(
-                          _webViewId, urlString);
-
-                      // Only update _currentUrl if it's in our predefined list
-                      // to avoid DropdownButton assertion errors
-                      final matchingUrl = _testUrls.firstWhere(
-                        (testUrl) => urlString.startsWith(testUrl),
-                        orElse: () => _currentUrl, // Keep current if no match
+          // URL selector
+          Container(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              children: [
+                const Text('URL: '),
+                Expanded(
+                  child: DropdownButton<String>(
+                    value: _currentUrl,
+                    isExpanded: true,
+                    items: _testUrls.map((url) {
+                      return DropdownMenuItem(
+                        value: url,
+                        child: Text(url),
                       );
-
-                      if (matchingUrl != _currentUrl) {
+                    }).toList(),
+                    onChanged: (String? newUrl) {
+                      if (newUrl != null) {
                         setState(() {
-                          _currentUrl = matchingUrl;
+                          _currentUrl = newUrl;
                         });
+                        _webViewController?.loadUrl(
+                          urlRequest: URLRequest(url: WebUri(newUrl)),
+                        );
                       }
-                    }
-                  },
-                  onConsoleMessage: (controller, consoleMessage) {
-                    // Forward console messages to inspector
-                    InAppWebViewInspector.addConsoleLog(
-                        _webViewId, consoleMessage);
-                  },
-                  initialSettings: InAppWebViewSettings(
-                    isInspectable: true,
-                    javaScriptEnabled: true,
-                    domStorageEnabled: true,
+                    },
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-          // WebView Inspector Widget
-          const InAppWebViewInspectorWidget(),
+          const SizedBox(height: 8),
+          // WebView - Inspector UI will be auto-injected when show() is called
+          Expanded(
+            child: InAppWebView(
+              initialUrlRequest: URLRequest(url: WebUri(_currentUrl)),
+              onWebViewCreated: (controller) {
+                _webViewController = controller;
+
+                // Register this WebView with the inspector using a descriptive identifier
+                // This automatically enables the inspector and makes the WebView visible
+                InAppWebViewInspector.registerWebView(
+                    _webViewId, controller, _currentUrl);
+              },
+              onLoadStop: (controller, url) {
+                if (url != null) {
+                  final urlString = url.toString();
+
+                  // Update URL in inspector
+                  InAppWebViewInspector.updateWebViewUrl(
+                      _webViewId, urlString);
+
+                  // Only update _currentUrl if it's in our predefined list
+                  // to avoid DropdownButton assertion errors
+                  final matchingUrl = _testUrls.firstWhere(
+                    (testUrl) => urlString.startsWith(testUrl),
+                    orElse: () => _currentUrl, // Keep current if no match
+                  );
+
+                  if (matchingUrl != _currentUrl) {
+                    setState(() {
+                      _currentUrl = matchingUrl;
+                    });
+                  }
+                }
+              },
+              onConsoleMessage: (controller, consoleMessage) {
+                // Forward console messages to inspector
+                InAppWebViewInspector.addConsoleLog(
+                    _webViewId, consoleMessage);
+              },
+              initialSettings: InAppWebViewSettings(
+                isInspectable: true,
+                javaScriptEnabled: true,
+                domStorageEnabled: true,
+              ),
+            ),
+          ),
         ],
       ),
       floatingActionButton: Column(
@@ -311,41 +307,39 @@ class _WebViewExampleState extends State<WebViewExample> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                '✨ New Features:',
+                '🎉 Zero Setup Auto UI Injection:',
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
               ),
               SizedBox(height: 8),
-              Text('• Memory-based script storage (no disk writes)'),
-              Text('• 15+ pre-loaded useful scripts'),
-              Text('• Enhanced JavaScript error handling'),
-              Text('• Smart DOM object serialization'),
-              Text('• Instant initialization'),
-              Text('• Usage frequency tracking'),
+              Text('• show() always auto-injects UI - no configuration needed'),
+              Text('• Zero setup required - just call toggle()'),
+              Text('• Automatic context discovery via WidgetsBinding'),
+              Text('• Works in debug mode when inspector is initialized'),
+              Text('• No manual Widget placement in your UI code'),
+              Text('• Optional NavigatorKey for optimal performance'),
               SizedBox(height: 16),
               Text(
                 '🚀 How to Use:',
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
               ),
               SizedBox(height: 8),
-              Text('1. Tap the bug icon to open Inspector'),
-              Text('2. Try the pre-loaded scripts in history'),
-              Text('3. Execute custom JavaScript'),
-              Text('4. Use the play button for test scripts'),
-              Text('5. Test DOM queries - they now work better!'),
+              Text('1. Initialize inspector in main()'),
+              Text('2. Tap the bug icon - UI auto-appears!'),
+              Text('3. No manual Widget placement needed'),
+              Text('4. Inspector automatically injects overlay UI'),
+              Text('5. Try the pre-loaded scripts in history'),
               SizedBox(height: 16),
               Text(
-                '📝 Pre-loaded Scripts Include:',
+                '⚙️ Implementation Details:',
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
               ),
               SizedBox(height: 8),
-              Text('• console.log("Hello World");'),
-              Text('• document.title'),
-              Text('• document.querySelector("h1") - now shows element info!'),
-              Text('• document.querySelectorAll("p") - shows all elements!'),
-              Text('• window.location.href'),
-              Text('• localStorage operations'),
-              Text('• Performance timing'),
-              Text('• And many more...'),
+              Text('• Simplified API - show() always attempts injection'),
+              Text('• Auto Context Discovery via WidgetsBinding'),
+              Text('• NavigatorKey fallback for optimal performance'),
+              Text('• OverlayEntry-based UI injection system'),
+              Text('• User controls initialization in debug mode'),
+              Text('• Smart retry mechanism with developer guidance'),
             ],
           ),
         ),

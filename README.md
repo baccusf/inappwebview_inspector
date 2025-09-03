@@ -13,6 +13,14 @@ A powerful WebView inspector and debugging tool for `flutter_inappwebview`. Prov
 
 ## ✨ Features
 
+### 🚀 **Zero Setup Auto UI Injection** *(New!)*
+- **No Manual Widget Placement**: Inspector UI automatically injects as overlay when `show()` is called
+- **Smart Context Discovery**: Automatic BuildContext discovery via WidgetsBinding and NavigatorKey fallback  
+- **Developer-Controlled**: User controls when auto-injection is enabled via debug mode initialization
+- **Hot Reload Compatible**: Robust overlay system that works seamlessly with Flutter's hot reload
+- **Performance Optimized**: Optional NavigatorKey integration for instant context access
+- **Zero Configuration**: Just call `toggle()` and the UI appears - no Stack widgets or manual placement needed
+
 ### 🖥️ **Real-time Console Monitoring**
 - **Live Console Output**: Monitor all JavaScript console messages (`log`, `warn`, `error`, `debug`) in real-time
 - **Color-coded Messages**: Different colors for different log levels for easy identification
@@ -79,29 +87,48 @@ $ flutter pub get
 Add this to your `main()` function:
 
 ```dart
+import 'package:flutter/foundation.dart';
 import 'package:inappwebview_inspector/inappwebview_inspector.dart';
 
 void main() {
-  // Initialize for development with enhanced features
-  InAppWebViewInspector.initializeDevelopment(
-    enableScriptHistory: true,
-    maxScriptHistoryCount: 25,
-    localizations: InAppWebViewInspectorLocalizations.english, // Change as needed
-    onScriptExecuted: (script, webViewId) {
-      print('Executed: $script on $webViewId');
-    },
-    onConsoleLog: (log) {
-      print('Console [${log.levelText}]: ${log.message}');
-    },
-  );
+  // Zero setup initialization - show() will auto-inject UI
+  if (kDebugMode) {
+    InAppWebViewInspector.initializeDevelopment(
+      enableScriptHistory: true,
+      maxScriptHistoryCount: 25,
+      localizations: InAppWebViewInspectorLocalizations.english, // Change as needed
+      onScriptExecuted: (script, webViewId) {
+        print('Executed: $script on $webViewId');
+      },
+      onConsoleLog: (log) {
+        print('Console [${log.levelText}]: ${log.message}');
+      },
+    );
+  }
   
   runApp(MyApp());
 }
 ```
 
-### 2. Add Inspector Widget to Your App
+### 2. Add NavigatorKey for Optimal Performance (Recommended)
 
-**⚠️ Important**: The inspector widget must be placed inside a `Stack` within your `Scaffold` body:
+```dart
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'WebView Inspector Demo',
+      // Add navigatorKey for optimal auto UI injection performance
+      navigatorKey: InAppWebViewInspector.navigatorKey,
+      home: MyWebViewPage(),
+    );
+  }
+}
+```
+
+### 3. Simple WebView Setup - Zero Manual UI Placement
+
+**✨ New: Zero Setup Auto UI Injection** - No need to manually add widgets to your UI!
 
 ```dart
 import 'package:flutter/material.dart';
@@ -123,56 +150,56 @@ class _MyWebViewPageState extends State<MyWebViewPage> {
       appBar: AppBar(
         title: Text('WebView with Inspector'),
         actions: [
-          // Toggle button for inspector
+          // Toggle button - UI will auto-inject when pressed!
           IconButton(
             icon: Icon(Icons.bug_report),
             onPressed: InAppWebViewInspector.toggle,
-            tooltip: 'Toggle Inspector',
+            tooltip: 'Toggle Inspector\n(Zero Setup - UI Auto-Injected!)',
           ),
         ],
       ),
-      body: Stack(  // ⚠️ Must use Stack here
+      // ✨ No Stack needed! Inspector UI auto-injects as overlay
+      body: Column(
         children: [
-          // Your main WebView
-          InAppWebView(
-            initialUrlRequest: URLRequest(
-              url: WebUri('https://flutter.dev'),
-            ),
-            onWebViewCreated: (controller) {
-              webViewController = controller;
-              
-              // Register WebView with inspector
-              InAppWebViewInspector.registerWebView(
-                webViewId,
-                controller,
-                'https://flutter.dev',
-              );
-            },
-            onLoadStop: (controller, url) {
-              // Update URL in inspector when navigation occurs
-              if (url != null) {
-                InAppWebViewInspector.updateWebViewUrl(
+          // Your main WebView - Inspector UI auto-injects when show() is called
+          Expanded(
+            child: InAppWebView(
+              initialUrlRequest: URLRequest(
+                url: WebUri('https://flutter.dev'),
+              ),
+              onWebViewCreated: (controller) {
+                webViewController = controller;
+                
+                // Register WebView with inspector
+                InAppWebViewInspector.registerWebView(
                   webViewId,
-                  url.toString(),
+                  controller,
+                  'https://flutter.dev',
                 );
-              }
-            },
-            onConsoleMessage: (controller, consoleMessage) {
-              // Forward console messages to inspector
-              InAppWebViewInspector.addConsoleLog(
-                webViewId,
-                consoleMessage,
-              );
-            },
-            initialSettings: InAppWebViewSettings(
-              isInspectable: true, // Enable debugging
-              javaScriptEnabled: true,
-              domStorageEnabled: true,
+              },
+              onLoadStop: (controller, url) {
+                // Update URL in inspector when navigation occurs
+                if (url != null) {
+                  InAppWebViewInspector.updateWebViewUrl(
+                    webViewId,
+                    url.toString(),
+                  );
+                }
+              },
+              onConsoleMessage: (controller, consoleMessage) {
+                // Forward console messages to inspector
+                InAppWebViewInspector.addConsoleLog(
+                  webViewId,
+                  consoleMessage,
+                );
+              },
+              initialSettings: InAppWebViewSettings(
+                isInspectable: true, // Enable debugging
+                javaScriptEnabled: true,
+                domStorageEnabled: true,
+              ),
             ),
           ),
-          
-          // Inspector overlay widget - MUST be inside Stack
-          const InAppWebViewInspectorWidget(),
         ],
       ),
     );
@@ -187,13 +214,13 @@ class _MyWebViewPageState extends State<MyWebViewPage> {
 }
 ```
 
-### 3. Control Inspector Visibility
+### 4. Control Inspector Visibility
 
 ```dart
-// Show/hide inspector
-InAppWebViewInspector.show();
-InAppWebViewInspector.hide();
-InAppWebViewInspector.toggle();
+// Show/hide inspector - UI automatically injects as overlay!
+InAppWebViewInspector.show();    // ✨ Auto-injects UI overlay
+InAppWebViewInspector.hide();    // Removes overlay
+InAppWebViewInspector.toggle();  // ✨ Toggle with auto-injection
 
 // Enable/disable inspector
 InAppWebViewInspector.enable();
@@ -209,60 +236,69 @@ bool isEnabled = InAppWebViewInspector.isEnabled;
 ### Development Mode (Recommended for Debug Builds)
 
 ```dart
-InAppWebViewInspector.initializeDevelopment(
-  enableScriptHistory: true,
-  maxScriptHistoryCount: 25,
-  maxConsoleLogCount: 500,
-  localizations: InAppWebViewInspectorLocalizations.english,
-  onScriptExecuted: (script, webViewId) {
-    print('Script executed on $webViewId: $script');
-  },
-  onConsoleLog: (log) {
-    print('Console [${log.levelText}]: ${log.message}');
-  },
-);
+// Zero setup - show() always auto-injects UI
+if (kDebugMode) {
+  InAppWebViewInspector.initializeDevelopment(
+    enableScriptHistory: true,
+    maxScriptHistoryCount: 25,
+    maxConsoleLogCount: 500,
+    localizations: InAppWebViewInspectorLocalizations.english,
+    onScriptExecuted: (script, webViewId) {
+      print('Script executed on $webViewId: $script');
+    },
+    onConsoleLog: (log) {
+      print('Console [${log.levelText}]: ${log.message}');
+    },
+  );
+}
 ```
 
 ### Production Mode (Minimal Impact)
 
 ```dart
-InAppWebViewInspector.initializeProduction(
-  maxConsoleLogCount: 50,
-  enableAutoResultLogging: false,
-  enableScriptHistory: false,
-  localizations: InAppWebViewInspectorLocalizations.english,
-);
+// Only initialize in production if needed
+if (!kReleaseMode) {
+  InAppWebViewInspector.initializeProduction(
+    maxConsoleLogCount: 50,
+    enableAutoResultLogging: false,
+    enableScriptHistory: false,
+    localizations: InAppWebViewInspectorLocalizations.english,
+  );
+}
 ```
 
 ### Advanced Custom Configuration
 
 ```dart
-InAppWebViewInspector.initializeWithConfig(
-  InAppWebViewInspectorConfig(
-    debugMode: true,
-    maxConsoleLogCount: 1000,
-    enableAutoResultLogging: true,
-    enableUnicodeQuoteNormalization: true,
-    enableBase64ScriptEncoding: true,
-    enableScriptHistory: true,
-    maxScriptHistoryCount: 30,
-    localizations: InAppWebViewInspectorLocalizations.korean, // Multi-language support
-    onScriptExecuted: (script, webViewId) {
-      // Custom script execution callback
-      analytics.logEvent('script_executed', {'webview_id': webViewId});
-    },
-    onConsoleLog: (log) {
-      // Custom console logging
-      if (log.level == ConsoleMessageLevel.ERROR) {
-        crashlytics.recordError(log.message, null);
-      }
-    },
-    onError: (error, webViewId) {
-      // Error handling callback
-      print('Inspector error in $webViewId: $error');
-    },
-  ),
-);
+// Advanced configuration with auto UI injection
+if (kDebugMode) {
+  InAppWebViewInspector.initializeWithConfig(
+    InAppWebViewInspectorConfig(
+      debugMode: true,
+      maxConsoleLogCount: 1000,
+      enableAutoResultLogging: true,
+      enableUnicodeQuoteNormalization: true,
+      enableBase64ScriptEncoding: true,
+      enableScriptHistory: true,
+      maxScriptHistoryCount: 30,
+      localizations: InAppWebViewInspectorLocalizations.korean, // Multi-language support
+      onScriptExecuted: (script, webViewId) {
+        // Custom script execution callback
+        analytics.logEvent('script_executed', {'webview_id': webViewId});
+      },
+      onConsoleLog: (log) {
+        // Custom console logging
+        if (log.level == ConsoleMessageLevel.ERROR) {
+          crashlytics.recordError(log.message, null);
+        }
+      },
+      onError: (error, webViewId) {
+        // Error handling callback
+        print('Inspector error in $webViewId: $error');
+      },
+    ),
+  );
+}
 ```
 
 ### Language Configuration
@@ -298,53 +334,58 @@ class _MultiWebViewExampleState extends State<MultiWebViewExample> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
-          Column(
-            children: [
-              // First WebView
-              Expanded(
-                child: InAppWebView(
-                  onWebViewCreated: (controller) {
-                    InAppWebViewInspector.registerWebView(
-                      'webview_1',
-                      controller,
-                      'https://flutter.dev',
-                    );
-                  },
-                  onConsoleMessage: (controller, consoleMessage) {
-                    InAppWebViewInspector.addConsoleLog('webview_1', consoleMessage);
-                  },
-                  initialSettings: InAppWebViewSettings(
-                    isInspectable: true,
-                    javaScriptEnabled: true,
-                  ),
-                ),
-              ),
-              // Second WebView  
-              Expanded(
-                child: InAppWebView(
-                  onWebViewCreated: (controller) {
-                    InAppWebViewInspector.registerWebView(
-                      'webview_2', 
-                      controller,
-                      'https://dart.dev',
-                    );
-                  },
-                  onConsoleMessage: (controller, consoleMessage) {
-                    InAppWebViewInspector.addConsoleLog('webview_2', consoleMessage);
-                  },
-                  initialSettings: InAppWebViewSettings(
-                    isInspectable: true,
-                    javaScriptEnabled: true,
-                  ),
-                ),
-              ),
-            ],
+      appBar: AppBar(
+        title: Text('Multiple WebViews'),
+        actions: [
+          // Single toggle button for all WebViews - UI auto-injects!
+          IconButton(
+            icon: Icon(Icons.bug_report),
+            onPressed: InAppWebViewInspector.toggle,
+            tooltip: 'Toggle Inspector\n(Zero Setup Auto UI)',
           ),
-          
-          // Single inspector manages both WebViews
-          const InAppWebViewInspectorWidget(),
+        ],
+      ),
+      // ✨ No Stack needed! Inspector UI auto-injects as overlay
+      body: Column(
+        children: [
+          // First WebView
+          Expanded(
+            child: InAppWebView(
+              onWebViewCreated: (controller) {
+                InAppWebViewInspector.registerWebView(
+                  'webview_1',
+                  controller,
+                  'https://flutter.dev',
+                );
+              },
+              onConsoleMessage: (controller, consoleMessage) {
+                InAppWebViewInspector.addConsoleLog('webview_1', consoleMessage);
+              },
+              initialSettings: InAppWebViewSettings(
+                isInspectable: true,
+                javaScriptEnabled: true,
+              ),
+            ),
+          ),
+          // Second WebView  
+          Expanded(
+            child: InAppWebView(
+              onWebViewCreated: (controller) {
+                InAppWebViewInspector.registerWebView(
+                  'webview_2', 
+                  controller,
+                  'https://dart.dev',
+                );
+              },
+              onConsoleMessage: (controller, consoleMessage) {
+                InAppWebViewInspector.addConsoleLog('webview_2', consoleMessage);
+              },
+              initialSettings: InAppWebViewSettings(
+                isInspectable: true,
+                javaScriptEnabled: true,
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -465,29 +506,48 @@ The inspector comes with 15+ ready-to-use JavaScript snippets:
 
 ## ⚠️ Important Implementation Notes
 
-### Widget Placement Requirements
+### ✨ Zero Setup Auto UI Injection
 
-The `InAppWebViewInspectorWidget` **must** be placed correctly to avoid runtime errors:
+**New Simplified Approach**: No manual widget placement required!
 
-✅ **Correct**: Inside Scaffold body Stack
+✅ **New Zero Setup Method**: Auto UI injection (Recommended)
+```dart
+// 1. Add NavigatorKey for optimal performance
+MaterialApp(
+  navigatorKey: InAppWebViewInspector.navigatorKey, // ✅ Optimal setup
+  home: MyWebViewPage(),
+)
+
+// 2. Simple UI with no Stack needed
+Scaffold(
+  body: Column(  // ✅ Simple layout
+    children: [
+      Expanded(
+        child: InAppWebView(
+          // Register WebView and inspector auto-injects UI
+          onWebViewCreated: (controller) {
+            InAppWebViewInspector.registerWebView('main', controller, url);
+          },
+        ),
+      ),
+    ],
+  ),
+)
+
+// 3. Toggle inspector - UI auto-appears as overlay!
+InAppWebViewInspector.toggle(); // ✅ Zero manual UI work
+```
+
+### Legacy Manual Widget Placement (Still Supported)
+
+For advanced use cases, you can still manually place the widget:
+
 ```dart
 Scaffold(
   body: Stack(
     children: [
       YourMainContent(),
-      const InAppWebViewInspectorWidget(), // ✅ Correct placement
-    ],
-  ),
-)
-```
-
-❌ **Incorrect**: Inside MaterialApp builder  
-```dart
-MaterialApp(
-  builder: (context, child) => Stack(
-    children: [
-      child!,
-      const InAppWebViewInspectorWidget(), // ❌ Will cause overlay errors
+      const InAppWebViewInspectorWidget(), // Manual placement
     ],
   ),
 )
@@ -495,9 +555,10 @@ MaterialApp(
 
 ### Common Issues & Solutions
 
-1. **"No Overlay widget found"**: Move the inspector widget from MaterialApp.builder to inside a Scaffold Stack
-2. **Inspector not showing**: Ensure you've called `InAppWebViewInspector.enable()` after registering a WebView
-3. **Dependency conflict with git-sourced flutter_inappwebview**: Add dependency override
+1. **Inspector not appearing**: Ensure NavigatorKey is added to MaterialApp for optimal context discovery
+2. **Auto UI injection fails**: Check that you're in debug mode and inspector is properly initialized
+3. **"No Overlay widget found"**: Add `navigatorKey: InAppWebViewInspector.navigatorKey` to your MaterialApp
+4. **Dependency conflict with git-sourced flutter_inappwebview**: Add dependency override
 
 If your app uses flutter_inappwebview from git source:
 ```yaml
@@ -519,20 +580,24 @@ dependency_overrides:
 
 ### Development vs Production
 
-**Development Build:**
+**Development Build with Auto UI Injection:**
 ```dart
-InAppWebViewInspector.initializeDevelopment(
-  enableScriptHistory: true,
-  maxConsoleLogCount: 500,
-);
+if (kDebugMode) {
+  InAppWebViewInspector.initializeDevelopment(
+    enableScriptHistory: true,
+    maxConsoleLogCount: 500,
+  );
+}
 ```
 
-**Production Build:**
+**Production Build (Optional):**
 ```dart
-InAppWebViewInspector.initializeProduction(
-  maxConsoleLogCount: 50,
-  enableScriptHistory: false,
-);
+if (!kReleaseMode) {
+  InAppWebViewInspector.initializeProduction(
+    maxConsoleLogCount: 50,
+    enableScriptHistory: false,
+  );
+}
 ```
 
 ## 📱 Example App

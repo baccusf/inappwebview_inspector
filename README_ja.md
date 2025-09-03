@@ -13,6 +13,14 @@
 
 ## ✨ 主要機能
 
+### 🚀 **ゼロセットアップ自動UI注入** *(新機能!)*
+- **手動ウィジェット配置不要**: `show()`呼び出し時にInspector UIが自動的にオーバーレイとして注入されます
+- **スマートコンテキスト発見**: WidgetsBindingとNavigatorKeyフォールバックによる自動BuildContext発見
+- **開発者制御**: ユーザーがデバッグモード初期化を通じて自動注入の有効化を制御します
+- **ホットリロード対応**: Flutterのホットリロードとスムーズに動作する堅牢なオーバーレイシステム
+- **パフォーマンス最適化**: 即座のコンテキストアクセスのための選択的NavigatorKey統合
+- **ゼロ設定**: `toggle()`を呼ぶだけでUIが表示 - Stackウィジェットや手動配置は不要
+
 ### 🖥️ **リアルタイムコンソールモニタリング**
 - **ライブコンソール出力**: すべてのJavaScriptコンソールメッセージ（`log`、`warn`、`error`、`debug`）をリアルタイムで監視
 - **色分けされたメッセージ**: ログレベルに応じた色分けで簡単に識別可能
@@ -79,29 +87,48 @@ $ flutter pub get
 `main()`関数に以下を追加してください：
 
 ```dart
+import 'package:flutter/foundation.dart';
 import 'package:inappwebview_inspector/inappwebview_inspector.dart';
 
 void main() {
-  // 拡張機能付きの開発用初期化
-  InAppWebViewInspector.initializeDevelopment(
-    enableScriptHistory: true,
-    maxScriptHistoryCount: 25,
-    localizations: InAppWebViewInspectorLocalizations.japanese, // 必要に応じて変更
-    onScriptExecuted: (script, webViewId) {
-      print('$webViewIdで実行: $script');
-    },
-    onConsoleLog: (log) {
-      print('コンソール [${log.levelText}]: ${log.message}');
-    },
-  );
+  // ゼロセットアップ初期化 - show()が自動的にUIを注入します
+  if (kDebugMode) {
+    InAppWebViewInspector.initializeDevelopment(
+      enableScriptHistory: true,
+      maxScriptHistoryCount: 25,
+      localizations: InAppWebViewInspectorLocalizations.japanese, // 必要に応じて変更
+      onScriptExecuted: (script, webViewId) {
+        print('$webViewIdで実行: $script');
+      },
+      onConsoleLog: (log) {
+        print('コンソール [${log.levelText}]: ${log.message}');
+      },
+    );
+  }
   
   runApp(MyApp());
 }
 ```
 
-### 2. アプリにインスペクターウィジェットを追加
+### 2. 最適なパフォーマンスのためのNavigatorKey追加（推奨）
 
-**⚠️ 重要**: インスペクターウィジェットは、`Scaffold`のボディ内の`Stack`の中に配置する必要があります：
+```dart
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'WebView Inspectorデモ',
+      // 最適な自動UI注入パフォーマンスのためのnavigatorKey追加
+      navigatorKey: InAppWebViewInspector.navigatorKey,
+      home: MyWebViewPage(),
+    );
+  }
+}
+```
+
+### 3. シンプルなWebViewセットアップ - ゼロ手動UI配置
+
+**✨ 新機能: ゼロセットアップ自動UI注入** - UIに手動でウィジェットを追加する必要はありません！
 
 ```dart
 import 'package:flutter/material.dart';

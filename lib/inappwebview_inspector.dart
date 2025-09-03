@@ -9,8 +9,7 @@ export 'src/services/inappwebview_inspector_script_history_manager.dart';
 
 // UI exports
 export 'src/ui/inappwebview_inspector_widget.dart';
-// Note: overlay manager removed due to overlay context issues
-// export 'src/ui/inspector_overlay_manager.dart';
+export 'src/ui/inappwebview_inspector_overlay_manager.dart';
 export 'src/ui/inappwebview_inspector_focus_controller.dart';
 export 'src/ui/inappwebview_inspector_script_history_controller.dart';
 
@@ -24,13 +23,13 @@ export 'src/utils/inappwebview_inspector_script_utils.dart';
 /// This library provides real-time console monitoring, JavaScript execution,
 /// and script history management with a draggable overlay interface.
 ///
-/// ## Quick Start
+/// ## Quick Start (Simple & Intuitive)
 ///
 /// ```dart
 /// // Initialize the inspector
 /// InAppWebViewInspector.initializeDevelopment();
 ///
-/// // In your WebView widget
+/// // Register your WebView
 /// InAppWebView(
 ///   onWebViewCreated: (controller) {
 ///     InAppWebViewInspector.registerWebView('main', controller, url);
@@ -38,6 +37,18 @@ export 'src/utils/inappwebview_inspector_script_utils.dart';
 ///   onConsoleMessage: (controller, consoleMessage) {
 ///     InAppWebViewInspector.addConsoleLog('main', consoleMessage);
 ///   },
+/// )
+///
+/// // Show inspector anywhere - UI automatically appears!
+/// InAppWebViewInspector.show(); // Always auto-injects UI
+/// ```
+///
+/// ## Optimal Setup (Best Performance)
+///
+/// ```dart
+/// MaterialApp(
+///   navigatorKey: InAppWebViewInspector.navigatorKey, // Add for instant context access
+///   home: MyHomePage(),
 /// )
 /// ```
 ///
