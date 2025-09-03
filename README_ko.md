@@ -9,7 +9,7 @@
 
 ## 🌍 언어별 문서
 
-- [English](README.md) | **한국어** | [日本語](README_ja.md)
+- [English](README.md) | **한국어** | [日本語 (Japanese)](README_ja.md)
 
 ## ✨ 주요 기능
 
@@ -70,8 +70,8 @@
 
 ```yaml
 dependencies:
-  inappwebview_inspector: ^0.1.0
-  flutter_inappwebview: ^6.0.0
+  inappwebview_inspector: ^0.2.0
+  flutter_inappwebview: ^6.1.5
 ```
 
 그런 다음 실행하세요:
@@ -350,6 +350,116 @@ if (kDebugMode) {
 - **📋 실시간 로그**: 타임스탬프가 있는 색상 구분 콘솔 출력
 - **🔄 크기 조절 가능한 인터페이스**: 컴팩트 및 최대화 모드 간 전환
 
+## 🔄 마이그레이션 가이드: v0.1.x → v0.2.0
+
+### ✨ v0.2.0의 새로운 기능
+
+**주요 기능: 제로 셋업 자동 UI 주입**
+- 더 이상 수동 위젯 배치가 필요하지 않습니다
+- 자동 컨텍스트 발견 및 오버레이 주입
+- `toggle()` 호출만으로 간소화된 통합
+
+### 🚨 주요 변경사항
+
+#### 1. **위젯 배치 더 이상 필요하지 않음** *(간소화됨 - 호환성 유지)*
+**이전 (v0.1.x)**: 수동 Stack 배치 필요
+```dart
+// ❌ 기존 방식 - 여전히 작동하지만 필요하지 않음
+Scaffold(
+  body: Stack(
+    children: [
+      YourContent(),
+      const InAppWebViewInspectorWidget(), // 수동 배치
+    ],
+  ),
+)
+```
+
+**이후 (v0.2.0)**: 제로 셋업 자동 주입 *(권장)*
+```dart
+// ✅ 새로운 방식 - UI가 오버레이로 자동 주입
+Scaffold(
+  body: YourContent(), // Stack 불필요!
+)
+
+// toggle 호출만으로 UI가 자동으로 나타남
+InAppWebViewInspector.toggle();
+```
+
+#### 2. **NavigatorKey 통합** *(새로운 권장사항)*
+최적의 성능을 위해 MaterialApp에 NavigatorKey를 추가하세요:
+
+```dart
+// ✅ v0.2.0 권장사항
+MaterialApp(
+  navigatorKey: InAppWebViewInspector.navigatorKey, // 새로 추가
+  home: YourHomePage(),
+)
+```
+
+### 📋 마이그레이션 단계
+
+#### 1단계: 의존성 업데이트
+```yaml
+dependencies:
+  inappwebview_inspector: ^0.2.0  # 업데이트됨
+  flutter_inappwebview: ^6.1.5
+```
+
+#### 2단계: NavigatorKey 추가 (권장)
+```dart
+MaterialApp(
+  navigatorKey: InAppWebViewInspector.navigatorKey, // 이 줄 추가
+  home: YourHomePage(),
+)
+```
+
+#### 3단계: UI 간소화 (선택사항)
+이제 수동 Stack 배치를 제거할 수 있습니다:
+```dart
+// 이전: Stack 필요
+Scaffold(
+  body: Stack(
+    children: [
+      YourContent(),
+      const InAppWebViewInspectorWidget(),
+    ],
+  ),
+)
+
+// 이후: 간단한 레이아웃 - Inspector가 자동 주입
+Scaffold(
+  body: YourContent(),
+)
+```
+
+#### 4단계: 자동 주입 테스트
+```dart
+// 다음을 호출하면 Inspector UI가 자동으로 주입됩니다:
+InAppWebViewInspector.show();
+InAppWebViewInspector.toggle();
+```
+
+### ⚡ 성능 개선사항
+
+- **빠른 컨텍스트 발견**: NavigatorKey가 즉시 컨텍스트 액세스 제공
+- **위젯 트리 감소**: 수동 Stack 위젯 불필요
+- **핫 리로드 친화적**: Flutter의 핫 리로드와 원활하게 작동하는 견고한 오버레이 시스템
+
+### 🔧 마이그레이션 문제 해결
+
+1. **Inspector가 나타나지 않음**: MaterialApp에 `navigatorKey: InAppWebViewInspector.navigatorKey` 추가
+2. **"No Overlay widget found"**: 초기화 후 `toggle()` 호출하는지 확인
+3. **레이아웃 문제**: 수동 Stack 배치 제거 - 자동 주입이 위치 처리
+
+### 🆕 v0.2.0의 새로운 기능
+
+- **자동 UI 주입**: 제로 셋업 오버레이 시스템
+- **스마트 컨텍스트 발견**: 자동 BuildContext 발견
+- **NavigatorKey 통합**: 선택적 성능 최적화
+- **향상된 오류 복구**: 더 나은 폴백 메커니즘
+- **핫 리로드 호환성**: 개선된 개발 경험
+
 ## ⚠️ 중요한 구현 참고사항
 
 ### ✨ 제로 셋업 자동 UI 주입
@@ -409,7 +519,7 @@ Scaffold(
 앱에서 flutter_inappwebview를 git 소스로 사용하는 경우:
 ```yaml
 dependencies:
-  inappwebview_inspector: ^0.1.1
+  inappwebview_inspector: ^0.2.0
   flutter_inappwebview:
     git:
       url: https://github.com/pichillilorenzo/flutter_inappwebview.git
@@ -426,9 +536,9 @@ dependency_overrides:
 
 ## 📋 요구사항
 
-- **Flutter**: >= 3.0.0
-- **Dart**: >= 3.0.6  
-- **flutter_inappwebview**: >= 6.0.0
+- **Flutter**: >= 3.24.0
+- **Dart**: >= 3.5.0  
+- **flutter_inappwebview**: >= 6.1.5
 
 ## 🌐 플랫폼 지원
 
