@@ -13,6 +13,7 @@ import '../utils/inappwebview_inspector_localizations.dart';
 
 // Size modes for WebView inspector (private to this file)
 enum _SizeMode {
+  minimal,
   medium,
   maximized;
 
@@ -23,6 +24,8 @@ enum _SizeMode {
             InAppWebViewInspectorConstants.defaultWidgetWidth, double.infinity);
 
     switch (this) {
+      case _SizeMode.minimal:
+        return const Size(60, 40); // Fixed compact size for minimal mode
       case _SizeMode.medium:
         return Size(width, InAppWebViewInspectorConstants.defaultWidgetHeight);
       case _SizeMode.maximized:
@@ -73,6 +76,7 @@ class _InAppWebViewInspectorWidgetState
 
   // Size modes
   _SizeMode _sizeMode = _SizeMode.medium;
+  _SizeMode _previousSizeMode = _SizeMode.medium; // Store previous mode for restoration
 
   // Size constants
   late Size _maximizedSize;
@@ -544,6 +548,11 @@ class _InAppWebViewInspectorWidgetState
             });
           }
 
+          // Show minimal view when in minimal mode
+          if (_sizeMode == _SizeMode.minimal) {
+            return _buildMinimalView(constraints);
+          }
+
           return Stack(
             children: [
               Positioned(
@@ -648,37 +657,68 @@ class _InAppWebViewInspectorWidgetState
               maxLines: 1,
             ),
           ),
-          IconButton(
-            onPressed: () => _setSizeMode(_SizeMode.medium),
-            icon: Icon(
-              Icons.crop_square,
-              color: _sizeMode == _SizeMode.medium ? Colors.blue : Colors.white,
-              size: 16,
-            ),
-            tooltip: '중간',
-          ),
-          IconButton(
-            onPressed: () => _setSizeMode(_SizeMode.maximized),
-            icon: Icon(
-              Icons.maximize,
-              color:
-                  _sizeMode == _SizeMode.maximized ? Colors.blue : Colors.white,
-              size: 16,
-            ),
-            tooltip: '최대',
-          ),
-          IconButton(
-            onPressed: () {
-              _inspector.hideInspector();
-            },
-            icon: const Icon(
-              Icons.close,
-              color: Colors.white,
-              size: 18,
-            ),
-            tooltip: '모니터 숨기기',
+          // Compact button group with reduced spacing
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _buildHeaderButton(
+                onPressed: () => _toggleToMinimalMode(),
+                icon: Icons.minimize,
+                color: Colors.white,
+                size: 16,
+                tooltip: '최소화',
+              ),
+              _buildHeaderButton(
+                onPressed: () => _setSizeMode(_SizeMode.medium),
+                icon: Icons.crop_square,
+                color: _sizeMode == _SizeMode.medium ? Colors.blue : Colors.white,
+                size: 16,
+                tooltip: '중간',
+              ),
+              _buildHeaderButton(
+                onPressed: () => _setSizeMode(_SizeMode.maximized),
+                icon: Icons.maximize,
+                color: _sizeMode == _SizeMode.maximized ? Colors.blue : Colors.white,
+                size: 16,
+                tooltip: '최대',
+              ),
+              _buildHeaderButton(
+                onPressed: () {
+                  _inspector.hideInspector();
+                },
+                icon: Icons.close,
+                color: Colors.white,
+                size: 18,
+                tooltip: '모니터 숨기기',
+              ),
+            ],
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildHeaderButton({
+    required VoidCallback onPressed,
+    required IconData icon,
+    required Color color,
+    required double size,
+    required String tooltip,
+  }) {
+    return SizedBox(
+      width: 32,
+      height: 32,
+      child: IconButton(
+        onPressed: onPressed,
+        icon: Icon(
+          icon,
+          color: color,
+          size: size,
+        ),
+        tooltip: tooltip,
+        padding: EdgeInsets.zero,
+        constraints: const BoxConstraints(),
+        splashRadius: 16,
       ),
     );
   }
@@ -1140,6 +1180,11 @@ class _InAppWebViewInspectorWidgetState
 
   void _setSizeMode(_SizeMode mode) {
     setState(() {
+      // Store previous mode for restoration (but don't store minimal mode)
+      if (_sizeMode != _SizeMode.minimal) {
+        _previousSizeMode = _sizeMode;
+      }
+      
       _sizeMode = mode;
       _size = mode.getSize(_maximizedSize, _safeAreaSize.width);
 
@@ -1153,7 +1198,119 @@ class _InAppWebViewInspectorWidgetState
           _position.dy.clamp(0.0, _safeAreaSize.height - _size.height),
         );
       }
+      
+      // Close popups when switching to minimal mode
+      if (mode == _SizeMode.minimal) {
+        _closeHistoryPopup();
+        _closeCustomDropdown();
+        _scriptFocusNode.unfocus();
+        FocusScope.of(context).unfocus();
+      }
     });
+  }
+
+  void _toggleToMinimalMode() {
+    _setSizeMode(_SizeMode.minimal);
+  }
+
+  void _restoreFromMinimalMode() {
+    _setSizeMode(_previousSizeMode);
+  }
+
+  Widget _buildMinimalView(BoxConstraints constraints) {
+    return Stack(
+      children: [
+        Positioned(
+          left: _position.dx,
+          top: _position.dy,
+          child: SizedBox(
+            width: _size.width,
+            height: _size.height,
+            child: GestureDetector(
+              onPanStart: (details) {
+                setState(() {
+                  _isDragging = true;
+                });
+              },
+              onPanUpdate: (details) {
+                if (_isDragging) {
+                  setState(() {
+                    double newX = (_position.dx + details.delta.dx)
+                        .clamp(0.0, constraints.maxWidth - _size.width);
+                    double newY = (_position.dy + details.delta.dy)
+                        .clamp(0.0, constraints.maxHeight - _size.height);
+
+                    _position = Offset(newX, newY);
+                  });
+                }
+              },
+              onPanEnd: (details) {
+                setState(() {
+                  _isDragging = false;
+                });
+              },
+              child: GestureDetector(
+                onTap: _restoreFromMinimalMode,
+                child: Material(
+                  elevation: 8,
+                  borderRadius: BorderRadius.circular(6),
+                  child: Container(
+                    width: _size.width,
+                    height: _size.height,
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: 0.9),
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(color: Colors.grey.shade600),
+                    ),
+                    child: Center(
+                      child: Stack(
+                        children: [
+                          const Icon(
+                            Icons.web,
+                            color: Colors.white,
+                            size: 20,
+                          ),
+                          // Show a small dot if there are active WebViews
+                          if (_webViews.isNotEmpty)
+                            Positioned(
+                              right: 0,
+                              top: 0,
+                              child: Container(
+                                width: 6,
+                                height: 6,
+                                decoration: const BoxDecoration(
+                                  color: Colors.green,
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                            ),
+                          // Show red dot if there are new console messages
+                          if (_consoleLogs.isNotEmpty && 
+                              _consoleLogs.any((log) => 
+                                log.level == ConsoleMessageLevel.ERROR))
+                            Positioned(
+                              right: 0,
+                              bottom: 0,
+                              child: Container(
+                                width: 6,
+                                height: 6,
+                                decoration: const BoxDecoration(
+                                  color: Colors.red,
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
   }
 
   Widget _buildHistoryPopupPositioned() {
