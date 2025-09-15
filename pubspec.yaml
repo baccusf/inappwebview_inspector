@@ -1,6 +1,6 @@
 name: inappwebview_inspector
 description: "A powerful WebView inspector for flutter_inappwebview with real-time console monitoring, JavaScript execution, and script history management."
-version: 0.1.2
+version: 0.2.0
 homepage: https://github.com/baccusf/inappwebview_inspector
 repository: https://github.com/baccusf/inappwebview_inspector
 issue_tracker: https://github.com/baccusf/inappwebview_inspector/issues
