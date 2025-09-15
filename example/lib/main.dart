@@ -136,8 +136,7 @@ class _WebViewExampleState extends State<WebViewExample> {
                   final urlString = url.toString();
 
                   // Update URL in inspector
-                  InAppWebViewInspector.updateWebViewUrl(
-                      _webViewId, urlString);
+                  InAppWebViewInspector.updateWebViewUrl(_webViewId, urlString);
 
                   // Only update _currentUrl if it's in our predefined list
                   // to avoid DropdownButton assertion errors
@@ -155,8 +154,7 @@ class _WebViewExampleState extends State<WebViewExample> {
               },
               onConsoleMessage: (controller, consoleMessage) {
                 // Forward console messages to inspector
-                InAppWebViewInspector.addConsoleLog(
-                    _webViewId, consoleMessage);
+                InAppWebViewInspector.addConsoleLog(_webViewId, consoleMessage);
               },
               initialSettings: InAppWebViewSettings(
                 isInspectable: true,

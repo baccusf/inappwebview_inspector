@@ -7,10 +7,12 @@ import '../ui/inappwebview_inspector_overlay_manager.dart';
 /// Main WebView Inspector class - Convenience class for quick setup
 class InAppWebViewInspector {
   /// NavigatorKey for optimal context access (optional but recommended)
-  static final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
-  
+  static final GlobalKey<NavigatorState> _navigatorKey =
+      GlobalKey<NavigatorState>();
+
   /// Get NavigatorKey for MaterialApp
   static GlobalKey<NavigatorState> get navigatorKey => _navigatorKey;
+
   /// Initialize WebView inspection with default configuration
   static void initialize({
     bool debugMode = false,
@@ -41,7 +43,7 @@ class InAppWebViewInspector {
     InAppWebViewInspectorFactory.initialize(config: config);
     InAppWebViewInspectorService.register(
         InAppWebViewInspectorFactory.getInstance());
-    
+
     // Register NavigatorKey for optimal context access
     InAppWebViewInspectorOverlayManager.registerNavigatorKey(_navigatorKey);
   }
@@ -51,7 +53,7 @@ class InAppWebViewInspector {
     InAppWebViewInspectorFactory.initialize(config: config);
     InAppWebViewInspectorService.register(
         InAppWebViewInspectorFactory.getInstance());
-    
+
     // Register NavigatorKey for optimal context access
     InAppWebViewInspectorOverlayManager.registerNavigatorKey(_navigatorKey);
   }
