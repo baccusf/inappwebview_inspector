@@ -9,7 +9,7 @@ A powerful WebView inspector and debugging tool for `flutter_inappwebview`. Prov
 
 ## 🌍 Multi-language Documentation
 
-- **English** | [한국어](README_ko.md) | [日本語](README_ja.md)
+- **English** | [한국어 (Korean)](README_ko.md) | [日本語 (Japanese)](README_ja.md)
 
 ## ✨ Features
 
@@ -70,8 +70,8 @@ Add this to your package's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  inappwebview_inspector: ^0.1.0
-  flutter_inappwebview: ^6.0.0
+  inappwebview_inspector: ^0.2.0
+  flutter_inappwebview: ^6.1.5
 ```
 
 Then run:
@@ -504,6 +504,116 @@ The inspector comes with 15+ ready-to-use JavaScript snippets:
 - **📋 Real-time Logs**: Color-coded console output with timestamps
 - **🔄 Resizable Interface**: Toggle between compact and maximized modes
 
+## 🔄 Migration Guide: v0.1.x → v0.2.0
+
+### ✨ What's New in v0.2.0
+
+**Major Feature: Zero Setup Auto UI Injection**
+- No more manual widget placement required
+- Automatic context discovery and overlay injection
+- Simplified integration with just `toggle()` calls
+
+### 🚨 Breaking Changes
+
+#### 1. **Widget Placement No Longer Required** *(Simplified - Not Breaking)*
+**Before (v0.1.x)**: Manual Stack placement required
+```dart
+// ❌ Old way - Still works but not needed
+Scaffold(
+  body: Stack(
+    children: [
+      YourContent(),
+      const InAppWebViewInspectorWidget(), // Manual placement
+    ],
+  ),
+)
+```
+
+**After (v0.2.0)**: Zero setup auto-injection *(Recommended)*
+```dart
+// ✅ New way - UI auto-injects as overlay
+Scaffold(
+  body: YourContent(), // No Stack needed!
+)
+
+// Just call toggle - UI appears automatically
+InAppWebViewInspector.toggle();
+```
+
+#### 2. **NavigatorKey Integration** *(New Recommendation)*
+For optimal performance, add NavigatorKey to your MaterialApp:
+
+```dart
+// ✅ Recommended for v0.2.0
+MaterialApp(
+  navigatorKey: InAppWebViewInspector.navigatorKey, // New
+  home: YourHomePage(),
+)
+```
+
+### 📋 Migration Steps
+
+#### Step 1: Update Dependencies
+```yaml
+dependencies:
+  inappwebview_inspector: ^0.2.0  # Updated
+  flutter_inappwebview: ^6.1.5
+```
+
+#### Step 2: Add NavigatorKey (Recommended)
+```dart
+MaterialApp(
+  navigatorKey: InAppWebViewInspector.navigatorKey, // Add this line
+  home: YourHomePage(),
+)
+```
+
+#### Step 3: Simplify UI (Optional)
+You can now remove manual Stack placement:
+```dart
+// Before: Required Stack
+Scaffold(
+  body: Stack(
+    children: [
+      YourContent(),
+      const InAppWebViewInspectorWidget(),
+    ],
+  ),
+)
+
+// After: Simple layout - Inspector auto-injects
+Scaffold(
+  body: YourContent(),
+)
+```
+
+#### Step 4: Test Auto-Injection
+```dart
+// Inspector UI will auto-inject when you call:
+InAppWebViewInspector.show();
+InAppWebViewInspector.toggle();
+```
+
+### ⚡ Performance Improvements
+
+- **Faster Context Discovery**: NavigatorKey provides instant context access
+- **Reduced Widget Tree**: No manual Stack widgets needed
+- **Hot Reload Friendly**: Robust overlay system works seamlessly with Flutter's hot reload
+
+### 🔧 Troubleshooting Migration Issues
+
+1. **Inspector not appearing**: Add `navigatorKey: InAppWebViewInspector.navigatorKey` to MaterialApp
+2. **"No Overlay widget found"**: Ensure you're calling `toggle()` after initialization
+3. **Layout issues**: Remove manual Stack placement - auto-injection handles positioning
+
+### 🆕 New Features in v0.2.0
+
+- **Automatic UI Injection**: Zero setup overlay system
+- **Smart Context Discovery**: Automatic BuildContext discovery
+- **NavigatorKey Integration**: Optional performance optimization
+- **Enhanced Error Recovery**: Better fallback mechanisms
+- **Hot Reload Compatibility**: Improved development experience
+
 ## ⚠️ Important Implementation Notes
 
 ### ✨ Zero Setup Auto UI Injection
@@ -563,7 +673,7 @@ Scaffold(
 If your app uses flutter_inappwebview from git source:
 ```yaml
 dependencies:
-  inappwebview_inspector: ^0.1.1
+  inappwebview_inspector: ^0.2.0
   flutter_inappwebview:
     git:
       url: https://github.com/pichillilorenzo/flutter_inappwebview.git
@@ -619,9 +729,9 @@ cd example && flutter run
 
 ## 📋 Requirements
 
-- **Flutter**: >= 3.0.0
-- **Dart**: >= 3.0.6  
-- **flutter_inappwebview**: >= 6.0.0
+- **Flutter**: >= 3.24.0
+- **Dart**: >= 3.5.0  
+- **flutter_inappwebview**: >= 6.1.5
 
 ## 🌐 Platform Support
 

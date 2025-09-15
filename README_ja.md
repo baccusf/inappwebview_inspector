@@ -70,8 +70,8 @@
 
 ```yaml
 dependencies:
-  inappwebview_inspector: ^0.1.0
-  flutter_inappwebview: ^6.0.0
+  inappwebview_inspector: ^0.2.0
+  flutter_inappwebview: ^6.1.5
 ```
 
 その後実行してください：
@@ -150,56 +150,56 @@ class _MyWebViewPageState extends State<MyWebViewPage> {
       appBar: AppBar(
         title: Text('WebView with Inspector'),
         actions: [
-          // インスペクター用トグルボタン
+          // トグルボタン - UIが自動注入されます！
           IconButton(
             icon: Icon(Icons.bug_report),
             onPressed: InAppWebViewInspector.toggle,
-            tooltip: 'インスペクタートグル',
+            tooltip: 'インスペクタートグル\n(ゼロセットアップ - UI自動注入！)',
           ),
         ],
       ),
-      body: Stack(  // ⚠️ ここでStackを使用必須
+      // ✨ Stackは必要ありません！Inspector UIがオーバーレイとして自動注入されます
+      body: Column(
         children: [
-          // メインWebView
-          InAppWebView(
-            initialUrlRequest: URLRequest(
-              url: WebUri('https://flutter.dev'),
-            ),
-            onWebViewCreated: (controller) {
-              webViewController = controller;
-              
-              // インスペクターにWebViewを登録
-              InAppWebViewInspector.registerWebView(
-                webViewId,
-                controller,
-                'https://flutter.dev',
-              );
-            },
-            onLoadStop: (controller, url) {
-              // ナビゲーション発生時にインスペクターでURL更新
-              if (url != null) {
-                InAppWebViewInspector.updateWebViewUrl(
+          // メインWebView - show()呼び出し時にInspector UIが自動注入されます
+          Expanded(
+            child: InAppWebView(
+              initialUrlRequest: URLRequest(
+                url: WebUri('https://flutter.dev'),
+              ),
+              onWebViewCreated: (controller) {
+                webViewController = controller;
+                
+                // インスペクターにWebViewを登録
+                InAppWebViewInspector.registerWebView(
                   webViewId,
-                  url.toString(),
+                  controller,
+                  'https://flutter.dev',
                 );
-              }
-            },
-            onConsoleMessage: (controller, consoleMessage) {
-              // コンソールメッセージをインスペクターに転送
-              InAppWebViewInspector.addConsoleLog(
-                webViewId,
-                consoleMessage,
-              );
-            },
-            initialSettings: InAppWebViewSettings(
-              isInspectable: true, // デバッグ有効化
-              javaScriptEnabled: true,
-              domStorageEnabled: true,
+              },
+              onLoadStop: (controller, url) {
+                // ナビゲーション発生時にインスペクターでURL更新
+                if (url != null) {
+                  InAppWebViewInspector.updateWebViewUrl(
+                    webViewId,
+                    url.toString(),
+                  );
+                }
+              },
+              onConsoleMessage: (controller, consoleMessage) {
+                // コンソールメッセージをインスペクターに転送
+                InAppWebViewInspector.addConsoleLog(
+                  webViewId,
+                  consoleMessage,
+                );
+              },
+              initialSettings: InAppWebViewSettings(
+                isInspectable: true, // デバッグ有効化
+                javaScriptEnabled: true,
+                domStorageEnabled: true,
+              ),
             ),
           ),
-          
-          // インスペクターオーバーレイウィジェット - Stack内に配置必須
-          const InAppWebViewInspectorWidget(),
         ],
       ),
     );
@@ -214,13 +214,13 @@ class _MyWebViewPageState extends State<MyWebViewPage> {
 }
 ```
 
-### 3. インスペクター表示制御
+### 4. インスペクター表示制御
 
 ```dart
-// インスペクター表示/非表示
-InAppWebViewInspector.show();
-InAppWebViewInspector.hide();
-InAppWebViewInspector.toggle();
+// インスペクター表示/非表示 - UIが自動的にオーバーレイとして注入されます！
+InAppWebViewInspector.show();    // ✨ UIオーバーレイを自動注入
+InAppWebViewInspector.hide();    // オーバーレイを削除
+InAppWebViewInspector.toggle();  // ✨ 自動注入でトグル
 
 // インスペクター有効/無効
 InAppWebViewInspector.enable();
@@ -341,6 +341,116 @@ InAppWebViewInspector.initializeWithConfig(
 - **📋 リアルタイムログ**: タイムスタンプ付きの色分けされたコンソール出力
 - **🔄 リサイザブルインターフェース**: コンパクトモードと最大化モード間の切り替え
 
+## 🔄 マイグレーションガイド: v0.1.x → v0.2.0
+
+### ✨ v0.2.0の新機能
+
+**主要機能: ゼロセットアップ自動UI注入**
+- 手動ウィジェット配置が不要になりました
+- 自動コンテキスト発見とオーバーレイ注入
+- `toggle()`呼び出しだけで簡素化された統合
+
+### 🚨 主要な変更点
+
+#### 1. **ウィジェット配置が不要になりました** *(簡素化 - 互換性維持)*
+**以前 (v0.1.x)**: 手動Stack配置が必要
+```dart
+// ❌ 古い方法 - まだ動作しますが不要
+Scaffold(
+  body: Stack(
+    children: [
+      YourContent(),
+      const InAppWebViewInspectorWidget(), // 手動配置
+    ],
+  ),
+)
+```
+
+**以後 (v0.2.0)**: ゼロセットアップ自動注入 *(推奨)*
+```dart
+// ✅ 新しい方法 - UIがオーバーレイとして自動注入
+Scaffold(
+  body: YourContent(), // Stack不要！
+)
+
+// toggleを呼ぶだけでUIが自動的に表示
+InAppWebViewInspector.toggle();
+```
+
+#### 2. **NavigatorKey統合** *(新しい推奨事項)*
+最適なパフォーマンスのためにMaterialAppにNavigatorKeyを追加してください:
+
+```dart
+// ✅ v0.2.0推奨事項
+MaterialApp(
+  navigatorKey: InAppWebViewInspector.navigatorKey, // 新規追加
+  home: YourHomePage(),
+)
+```
+
+### 📋 マイグレーション手順
+
+#### ステップ1: 依存関係の更新
+```yaml
+dependencies:
+  inappwebview_inspector: ^0.2.0  # 更新
+  flutter_inappwebview: ^6.1.5
+```
+
+#### ステップ2: NavigatorKeyの追加 (推奨)
+```dart
+MaterialApp(
+  navigatorKey: InAppWebViewInspector.navigatorKey, // この行を追加
+  home: YourHomePage(),
+)
+```
+
+#### ステップ3: UIの簡素化 (オプション)
+手動Stack配置を削除できるようになりました:
+```dart
+// 以前: Stack必須
+Scaffold(
+  body: Stack(
+    children: [
+      YourContent(),
+      const InAppWebViewInspectorWidget(),
+    ],
+  ),
+)
+
+// 以後: シンプルなレイアウト - Inspectorが自動注入
+Scaffold(
+  body: YourContent(),
+)
+```
+
+#### ステップ4: 自動注入のテスト
+```dart
+// 以下を呼び出すとInspector UIが自動的に注入されます:
+InAppWebViewInspector.show();
+InAppWebViewInspector.toggle();
+```
+
+### ⚡ パフォーマンス向上
+
+- **高速コンテキスト発見**: NavigatorKeyが即座にコンテキストアクセスを提供
+- **ウィジェットツリーの削減**: 手動Stackウィジェットが不要
+- **ホットリロード対応**: Flutterのホットリロードとスムーズに動作する堅牢なオーバーレイシステム
+
+### 🔧 マイグレーション問題のトラブルシューティング
+
+1. **Inspectorが表示されない**: MaterialAppに`navigatorKey: InAppWebViewInspector.navigatorKey`を追加
+2. **"No Overlay widget found"**: 初期化後に`toggle()`を呼び出しているか確認
+3. **レイアウト問題**: 手動Stack配置を削除 - 自動注入が位置決めを処理
+
+### 🆕 v0.2.0の新機能
+
+- **自動UI注入**: ゼロセットアップオーバーレイシステム
+- **スマートコンテキスト発見**: 自動BuildContext発見
+- **NavigatorKey統合**: オプションのパフォーマンス最適化
+- **強化されたエラー復旧**: より良いフォールバックメカニズム
+- **ホットリロード互換性**: 改善された開発体験
+
 ## ⚠️ 重要な実装注意事項
 
 ### ウィジェット配置要件
@@ -380,7 +490,7 @@ MaterialApp(
 アプリでflutter_inappwebviewをgitソースから使用している場合:
 ```yaml
 dependencies:
-  inappwebview_inspector: ^0.1.1
+  inappwebview_inspector: ^0.2.0
   flutter_inappwebview:
     git:
       url: https://github.com/pichillilorenzo/flutter_inappwebview.git
@@ -397,9 +507,9 @@ dependency_overrides:
 
 ## 📋 要件
 
-- **Flutter**: >= 3.0.0
-- **Dart**: >= 3.0.6  
-- **flutter_inappwebview**: >= 6.0.0
+- **Flutter**: >= 3.24.0
+- **Dart**: >= 3.5.0  
+- **flutter_inappwebview**: >= 6.1.5
 
 ## 🌐 プラットフォームサポート
 

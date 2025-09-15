@@ -8,15 +8,12 @@ import '../services/inappwebview_inspector_script_history_manager.dart';
 import '../services/inappwebview_inspector_script_history.dart';
 import 'inappwebview_inspector_script_history_controller.dart';
 import 'inappwebview_inspector_focus_controller.dart';
+import 'inappwebview_inspector_header_widget.dart';
 import '../utils/inappwebview_inspector_constants.dart';
 import '../utils/inappwebview_inspector_localizations.dart';
 
-// Size modes for WebView inspector (private to this file)
-enum _SizeMode {
-  minimal,
-  medium,
-  maximized;
-
+// Size calculation helper extension
+extension InAppWebViewInspectorSizeModeExtension on InAppWebViewInspectorSizeMode {
   /// Get the size for this mode
   Size getSize(Size? maximizedSize, double screenWidth) {
     final width =
@@ -24,11 +21,11 @@ enum _SizeMode {
             InAppWebViewInspectorConstants.defaultWidgetWidth, double.infinity);
 
     switch (this) {
-      case _SizeMode.minimal:
+      case InAppWebViewInspectorSizeMode.minimal:
         return const Size(60, 40); // Fixed compact size for minimal mode
-      case _SizeMode.medium:
+      case InAppWebViewInspectorSizeMode.medium:
         return Size(width, InAppWebViewInspectorConstants.defaultWidgetHeight);
-      case _SizeMode.maximized:
+      case InAppWebViewInspectorSizeMode.maximized:
         return maximizedSize ??
             Size(width, InAppWebViewInspectorConstants.defaultWidgetHeight);
     }
@@ -75,8 +72,8 @@ class _InAppWebViewInspectorWidgetState
   bool _isDragging = false;
 
   // Size modes
-  _SizeMode _sizeMode = _SizeMode.medium;
-  _SizeMode _previousSizeMode = _SizeMode.medium; // Store previous mode for restoration
+  InAppWebViewInspectorSizeMode _sizeMode = InAppWebViewInspectorSizeMode.medium;
+  InAppWebViewInspectorSizeMode _previousSizeMode = InAppWebViewInspectorSizeMode.medium; // Store previous mode for restoration
 
   // Size constants
   late Size _maximizedSize;
@@ -538,7 +535,7 @@ class _InAppWebViewInspectorWidgetState
         builder: (context, constraints) {
           _safeAreaSize = Size(constraints.maxWidth, constraints.maxHeight);
 
-          if (_sizeMode == _SizeMode.maximized) {
+          if (_sizeMode == InAppWebViewInspectorSizeMode.maximized) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
               setState(() {
                 _maximizedSize =
@@ -549,7 +546,7 @@ class _InAppWebViewInspectorWidgetState
           }
 
           // Show minimal view when in minimal mode
-          if (_sizeMode == _SizeMode.minimal) {
+          if (_sizeMode == InAppWebViewInspectorSizeMode.minimal) {
             return _buildMinimalView(constraints);
           }
 
@@ -631,70 +628,12 @@ class _InAppWebViewInspectorWidgetState
   }
 
   Widget _buildHeader() {
-    return Container(
-      height: 50,
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      decoration: BoxDecoration(
-        color: Colors.grey.shade800,
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(8),
-          topRight: Radius.circular(8),
-        ),
-      ),
-      child: Row(
-        children: [
-          const Icon(Icons.web, color: Colors.white, size: 20),
-          const SizedBox(width: 8),
-          const Expanded(
-            child: Text(
-              'WebView Monitor',
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 12,
-              ),
-              overflow: TextOverflow.ellipsis,
-              maxLines: 1,
-            ),
-          ),
-          // Compact button group with reduced spacing
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _buildHeaderButton(
-                onPressed: () => _toggleToMinimalMode(),
-                icon: Icons.minimize,
-                color: Colors.white,
-                size: 16,
-                tooltip: '최소화',
-              ),
-              _buildHeaderButton(
-                onPressed: () => _setSizeMode(_SizeMode.medium),
-                icon: Icons.crop_square,
-                color: _sizeMode == _SizeMode.medium ? Colors.blue : Colors.white,
-                size: 16,
-                tooltip: '중간',
-              ),
-              _buildHeaderButton(
-                onPressed: () => _setSizeMode(_SizeMode.maximized),
-                icon: Icons.maximize,
-                color: _sizeMode == _SizeMode.maximized ? Colors.blue : Colors.white,
-                size: 16,
-                tooltip: '최대',
-              ),
-              _buildHeaderButton(
-                onPressed: () {
-                  _inspector.hideInspector();
-                },
-                icon: Icons.close,
-                color: Colors.white,
-                size: 18,
-                tooltip: '모니터 숨기기',
-              ),
-            ],
-          ),
-        ],
-      ),
+    return InAppWebViewInspectorHeaderWidget(
+      currentSizeMode: _sizeMode,
+      onMinimize: _toggleToMinimalMode,
+      onMedium: () => _setSizeMode(InAppWebViewInspectorSizeMode.medium),
+      onMaximize: () => _setSizeMode(InAppWebViewInspectorSizeMode.maximized),
+      onClose: () => _inspector.hideInspector(),
     );
   }
 
@@ -1178,21 +1117,21 @@ class _InAppWebViewInspectorWidgetState
     });
   }
 
-  void _setSizeMode(_SizeMode mode) {
+  void _setSizeMode(InAppWebViewInspectorSizeMode mode) {
     setState(() {
       // Store previous mode for restoration (but don't store minimal mode)
-      if (_sizeMode != _SizeMode.minimal) {
+      if (_sizeMode != InAppWebViewInspectorSizeMode.minimal) {
         _previousSizeMode = _sizeMode;
       }
       
       _sizeMode = mode;
       _size = mode.getSize(_maximizedSize, _safeAreaSize.width);
 
-      if (mode == _SizeMode.maximized) {
+      if (mode == InAppWebViewInspectorSizeMode.maximized) {
         _position = const Offset(0, 0);
       }
 
-      if (mode != _SizeMode.maximized) {
+      if (mode != InAppWebViewInspectorSizeMode.maximized) {
         _position = Offset(
           _position.dx.clamp(0.0, _safeAreaSize.width - _size.width),
           _position.dy.clamp(0.0, _safeAreaSize.height - _size.height),
@@ -1200,7 +1139,7 @@ class _InAppWebViewInspectorWidgetState
       }
       
       // Close popups when switching to minimal mode
-      if (mode == _SizeMode.minimal) {
+      if (mode == InAppWebViewInspectorSizeMode.minimal) {
         _closeHistoryPopup();
         _closeCustomDropdown();
         _scriptFocusNode.unfocus();
@@ -1210,7 +1149,7 @@ class _InAppWebViewInspectorWidgetState
   }
 
   void _toggleToMinimalMode() {
-    _setSizeMode(_SizeMode.minimal);
+    _setSizeMode(InAppWebViewInspectorSizeMode.minimal);
   }
 
   void _restoreFromMinimalMode() {
