@@ -13,7 +13,8 @@ import '../utils/inappwebview_inspector_constants.dart';
 import '../utils/inappwebview_inspector_localizations.dart';
 
 // Size calculation helper extension
-extension InAppWebViewInspectorSizeModeExtension on InAppWebViewInspectorSizeMode {
+extension InAppWebViewInspectorSizeModeExtension
+    on InAppWebViewInspectorSizeMode {
   /// Get the size for this mode
   Size getSize(Size? maximizedSize, double screenWidth) {
     final width =
@@ -72,8 +73,11 @@ class _InAppWebViewInspectorWidgetState
   bool _isDragging = false;
 
   // Size modes
-  InAppWebViewInspectorSizeMode _sizeMode = InAppWebViewInspectorSizeMode.medium;
-  InAppWebViewInspectorSizeMode _previousSizeMode = InAppWebViewInspectorSizeMode.medium; // Store previous mode for restoration
+  InAppWebViewInspectorSizeMode _sizeMode =
+      InAppWebViewInspectorSizeMode.medium;
+  InAppWebViewInspectorSizeMode _previousSizeMode =
+      InAppWebViewInspectorSizeMode
+          .medium; // Store previous mode for restoration
 
   // Size constants
   late Size _maximizedSize;
@@ -637,7 +641,6 @@ class _InAppWebViewInspectorWidgetState
     );
   }
 
-
   Widget _buildWebViewSelector() {
     return Container(
       padding: const EdgeInsets.all(8),
@@ -1099,7 +1102,7 @@ class _InAppWebViewInspectorWidgetState
       if (_sizeMode != InAppWebViewInspectorSizeMode.minimal) {
         _previousSizeMode = _sizeMode;
       }
-      
+
       _sizeMode = mode;
       _size = mode.getSize(_maximizedSize, _safeAreaSize.width);
 
@@ -1113,7 +1116,7 @@ class _InAppWebViewInspectorWidgetState
           _position.dy.clamp(0.0, _safeAreaSize.height - _size.height),
         );
       }
-      
+
       // Close popups when switching to minimal mode
       if (mode == InAppWebViewInspectorSizeMode.minimal) {
         _closeHistoryPopup();
@@ -1200,9 +1203,9 @@ class _InAppWebViewInspectorWidgetState
                               ),
                             ),
                           // Show red dot if there are new console messages
-                          if (_consoleLogs.isNotEmpty && 
-                              _consoleLogs.any((log) => 
-                                log.level == ConsoleMessageLevel.ERROR))
+                          if (_consoleLogs.isNotEmpty &&
+                              _consoleLogs.any((log) =>
+                                  log.level == ConsoleMessageLevel.ERROR))
                             Positioned(
                               right: 0,
                               bottom: 0,

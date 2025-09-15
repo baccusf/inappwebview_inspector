@@ -67,8 +67,8 @@ class InAppWebViewInspectorHeaderWidget extends StatelessWidget {
               _buildHeaderButton(
                 onPressed: onMedium,
                 icon: Icons.crop_square,
-                color: currentSizeMode == InAppWebViewInspectorSizeMode.medium 
-                    ? Colors.blue 
+                color: currentSizeMode == InAppWebViewInspectorSizeMode.medium
+                    ? Colors.blue
                     : Colors.white,
                 size: 16,
                 tooltip: '중간',
@@ -76,9 +76,10 @@ class InAppWebViewInspectorHeaderWidget extends StatelessWidget {
               _buildHeaderButton(
                 onPressed: onMaximize,
                 icon: Icons.maximize,
-                color: currentSizeMode == InAppWebViewInspectorSizeMode.maximized 
-                    ? Colors.blue 
-                    : Colors.white,
+                color:
+                    currentSizeMode == InAppWebViewInspectorSizeMode.maximized
+                        ? Colors.blue
+                        : Colors.white,
                 size: 16,
                 tooltip: '최대',
               ),

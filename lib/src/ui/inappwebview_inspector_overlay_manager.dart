@@ -10,7 +10,7 @@ class InAppWebViewInspectorOverlayManager {
   static Timer? _contextSearchTimer;
   static bool _initialized = false;
   static bool _setupGuidanceShown = false;
-  
+
   /// Show inspector with automatic context discovery
   static void showInspector({
     InAppWebViewInspectorInterface? inspector,
@@ -18,14 +18,14 @@ class InAppWebViewInspectorOverlayManager {
   }) {
     // If already visible, do nothing
     if (_overlayEntry != null) return;
-    
+
     if (!_initialized) {
       _autoInitialize(inspector: inspector, config: config);
     } else {
       _createOverlayIfContextAvailable(inspector: inspector, config: config);
     }
   }
-  
+
   /// Hide inspector overlay
   static void hideInspector() {
     _overlayEntry?.remove();
@@ -33,10 +33,10 @@ class InAppWebViewInspectorOverlayManager {
     _contextSearchTimer?.cancel();
     _contextSearchTimer = null;
   }
-  
+
   /// Check if inspector is currently visible
   static bool get isVisible => _overlayEntry != null;
-  
+
   /// Initialize automatic context discovery system
   static void _autoInitialize({
     InAppWebViewInspectorInterface? inspector,
@@ -44,7 +44,7 @@ class InAppWebViewInspectorOverlayManager {
   }) {
     if (_initialized) return;
     _initialized = true;
-    
+
     // Try immediate context discovery
     final context = _discoverActiveContext();
     if (context != null) {
@@ -52,11 +52,11 @@ class InAppWebViewInspectorOverlayManager {
       _createOverlay(context, inspector: inspector, config: config);
       return;
     }
-    
+
     // Start periodic context search
     _startContextSearch(inspector: inspector, config: config);
   }
-  
+
   /// Start periodic context search with retry mechanism
   static void _startContextSearch({
     InAppWebViewInspectorInterface? inspector,
@@ -64,10 +64,10 @@ class InAppWebViewInspectorOverlayManager {
   }) {
     var attempts = 0;
     const maxAttempts = 50; // 5 seconds with 100ms intervals
-    
+
     _contextSearchTimer = Timer.periodic(Duration(milliseconds: 100), (timer) {
       attempts++;
-      
+
       final context = _discoverActiveContext();
       if (context != null) {
         _discoveredContext = context;
@@ -75,7 +75,7 @@ class InAppWebViewInspectorOverlayManager {
         _createOverlay(context, inspector: inspector, config: config);
         return;
       }
-      
+
       // After max attempts, show guidance and stop searching
       if (attempts >= maxAttempts) {
         timer.cancel();
@@ -83,14 +83,14 @@ class InAppWebViewInspectorOverlayManager {
       }
     });
   }
-  
+
   /// Register NavigatorKey for optimal context access
   static GlobalKey<NavigatorState>? _navigatorKey;
-  
+
   static void registerNavigatorKey(GlobalKey<NavigatorState> navigatorKey) {
     _navigatorKey = navigatorKey;
   }
-  
+
   /// Discover active BuildContext automatically
   static BuildContext? _discoverActiveContext() {
     try {
@@ -104,7 +104,7 @@ class InAppWebViewInspectorOverlayManager {
           // NavigatorKey context doesn't have overlay, continue with other methods
         }
       }
-      
+
       // Method 1: Try to get context from focus system
       final binding = WidgetsBinding.instance;
       final focusManager = binding.focusManager;
@@ -119,8 +119,8 @@ class InAppWebViewInspectorOverlayManager {
           // This context doesn't have overlay, continue searching
         }
       }
-      
-      // Method 3: Try to get context from BuildOwner if available  
+
+      // Method 3: Try to get context from BuildOwner if available
       final buildOwner = binding.buildOwner;
       if (buildOwner != null) {
         // Use a simpler approach to find a valid context
@@ -139,16 +139,15 @@ class InAppWebViewInspectorOverlayManager {
           // Continue with other methods
         }
       }
-      
     } catch (e) {
       // Context discovery failed, will retry
       // Context discovery attempt failed, will retry
       // Debug output controlled by config in calling methods
     }
-    
+
     return null;
   }
-  
+
   /// Create overlay entry with the discovered context
   static void _createOverlay(
     BuildContext context, {
@@ -162,13 +161,15 @@ class InAppWebViewInspectorOverlayManager {
           config: config,
         ),
       );
-      
+
       final overlay = Overlay.of(context);
       overlay.insert(_overlayEntry!);
-      
-      final effectiveConfig = config ?? InAppWebViewInspectorConfig.defaultConfig;
+
+      final effectiveConfig =
+          config ?? InAppWebViewInspectorConfig.defaultConfig;
       if (effectiveConfig.debugMode) {
-        debugPrint('🎉 InAppWebViewInspector: Auto-setup successful! Inspector is now available.');
+        debugPrint(
+            '🎉 InAppWebViewInspector: Auto-setup successful! Inspector is now available.');
       }
     } catch (e) {
       // Failed to create overlay, show guidance
@@ -177,7 +178,7 @@ class InAppWebViewInspectorOverlayManager {
       _showSetupGuidance();
     }
   }
-  
+
   /// Create overlay if context is available, otherwise start discovery
   static void _createOverlayIfContextAvailable({
     InAppWebViewInspectorInterface? inspector,
@@ -189,12 +190,12 @@ class InAppWebViewInspectorOverlayManager {
       _startContextSearch(inspector: inspector, config: config);
     }
   }
-  
+
   /// Show setup guidance for developers
   static void _showSetupGuidance() {
     if (_setupGuidanceShown) return;
     _setupGuidanceShown = true;
-    
+
     debugPrint('''
 🔧 InAppWebViewInspector: Auto-setup needs help!
 
@@ -210,7 +211,7 @@ MaterialApp(
 The inspector will keep trying automatically in the background...
     ''');
   }
-  
+
   /// Reset initialization state (useful for hot reload)
   static void reset() {
     _initialized = false;
@@ -218,7 +219,7 @@ The inspector will keep trying automatically in the background...
     _discoveredContext = null;
     hideInspector();
   }
-  
+
   /// Dispose all resources
   static void dispose() {
     hideInspector();

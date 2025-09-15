@@ -367,7 +367,7 @@ class InAppWebViewInspectorImpl implements InAppWebViewInspectorInterface {
   void showInspector() {
     _isInspectorVisible = true;
     _visibilityController.add(_isInspectorVisible);
-    
+
     // Auto-inject UI using overlay manager
     InAppWebViewInspectorOverlayManager.showInspector(
       inspector: this,
@@ -379,7 +379,7 @@ class InAppWebViewInspectorImpl implements InAppWebViewInspectorInterface {
   void hideInspector() {
     _isInspectorVisible = false;
     _visibilityController.add(_isInspectorVisible);
-    
+
     // Hide overlay UI
     InAppWebViewInspectorOverlayManager.hideInspector();
   }
@@ -396,7 +396,7 @@ class InAppWebViewInspectorImpl implements InAppWebViewInspectorInterface {
     _isInspectorVisible = false;
     _enabledController.add(_isInspectorEnabled);
     _visibilityController.add(_isInspectorVisible);
-    
+
     // Hide overlay UI when disabling
     InAppWebViewInspectorOverlayManager.hideInspector();
   }
@@ -415,7 +415,7 @@ class InAppWebViewInspectorImpl implements InAppWebViewInspectorInterface {
   void dispose() {
     // Clean up overlay UI
     InAppWebViewInspectorOverlayManager.dispose();
-    
+
     _consoleLogsController.close();
     _activeWebViewController.close();
     _visibilityController.close();
