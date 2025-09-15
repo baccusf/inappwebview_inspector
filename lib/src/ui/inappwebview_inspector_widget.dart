@@ -637,30 +637,6 @@ class _InAppWebViewInspectorWidgetState
     );
   }
 
-  Widget _buildHeaderButton({
-    required VoidCallback onPressed,
-    required IconData icon,
-    required Color color,
-    required double size,
-    required String tooltip,
-  }) {
-    return SizedBox(
-      width: 32,
-      height: 32,
-      child: IconButton(
-        onPressed: onPressed,
-        icon: Icon(
-          icon,
-          color: color,
-          size: size,
-        ),
-        tooltip: tooltip,
-        padding: EdgeInsets.zero,
-        constraints: const BoxConstraints(),
-        splashRadius: 16,
-      ),
-    );
-  }
 
   Widget _buildWebViewSelector() {
     return Container(
