@@ -70,7 +70,7 @@
 
 ```yaml
 dependencies:
-  inappwebview_inspector: ^0.2.0
+  inappwebview_inspector: ^0.2.1
   flutter_inappwebview: ^6.1.5
 ```
 
@@ -393,7 +393,7 @@ MaterialApp(
 #### ステップ1: 依存関係の更新
 ```yaml
 dependencies:
-  inappwebview_inspector: ^0.2.0  # 更新
+  inappwebview_inspector: ^0.2.1  # 更新
   flutter_inappwebview: ^6.1.5
 ```
 
@@ -490,7 +490,7 @@ MaterialApp(
 アプリでflutter_inappwebviewをgitソースから使用している場合:
 ```yaml
 dependencies:
-  inappwebview_inspector: ^0.2.0
+  inappwebview_inspector: ^0.2.1
   flutter_inappwebview:
     git:
       url: https://github.com/pichillilorenzo/flutter_inappwebview.git
