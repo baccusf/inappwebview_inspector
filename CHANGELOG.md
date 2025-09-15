@@ -5,6 +5,84 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2024-12-19
+
+### ✨ Major New Features
+
+#### 🚀 **Zero Setup Auto UI Injection** *(Game Changer)*
+- **Automatic UI Injection**: Inspector UI now auto-injects as overlay when `show()` or `toggle()` is called
+- **Smart Context Discovery**: Automatic BuildContext discovery via WidgetsBinding and NavigatorKey fallback
+- **NavigatorKey Integration**: Optional NavigatorKey support for optimal performance (`navigatorKey: InAppWebViewInspector.navigatorKey`)
+- **Hot Reload Compatible**: Robust overlay system that works seamlessly with Flutter's hot reload
+- **Developer-Controlled**: Auto-injection is enabled via debug mode initialization
+
+#### 🏗️ **New Architecture Components**
+- `InAppWebViewInspectorOverlayManager`: Manages automatic UI injection and overlay lifecycle
+- Enhanced `InAppWebViewInspectorFactory`: Improved service management with auto-injection support
+- Smart context discovery system with multiple fallback strategies
+
+### 🔄 **Breaking Changes (Backward Compatible)**
+
+#### 📦 **Simplified Integration**
+- **No Manual Widget Placement Required**: Stack widgets with manual `InAppWebViewInspectorWidget` placement no longer needed
+- **Streamlined Setup**: Just add NavigatorKey to MaterialApp and call `toggle()` - UI appears automatically
+- **Backward Compatibility**: Old manual placement method still works but is deprecated
+
+### ⚡ **Performance Improvements**
+- **Faster Context Discovery**: NavigatorKey provides instant context access
+- **Reduced Widget Tree**: No manual Stack widgets needed
+- **Optimized Overlay Management**: Enhanced overlay lifecycle management
+
+### 📋 **Migration Guide (v0.1.x → v0.2.0)**
+
+#### **Step 1: Update Dependency**
+```yaml
+dependencies:
+  inappwebview_inspector: ^0.2.0  # Updated
+```
+
+#### **Step 2: Add NavigatorKey (Recommended)**
+```dart
+MaterialApp(
+  navigatorKey: InAppWebViewInspector.navigatorKey, // Add this line
+  home: YourHomePage(),
+)
+```
+
+#### **Step 3: Simplify UI (Optional)**
+Remove manual Stack placement - Inspector auto-injects as overlay:
+```dart
+// Before (v0.1.x): Manual Stack required
+Scaffold(
+  body: Stack(
+    children: [
+      YourContent(),
+      const InAppWebViewInspectorWidget(), // Manual placement
+    ],
+  ),
+)
+
+// After (v0.2.0): Auto-injection (recommended)
+Scaffold(
+  body: YourContent(), // No Stack needed!
+)
+InAppWebViewInspector.toggle(); // UI auto-injects
+```
+
+### 🐛 **Bug Fixes**
+- Fixed overlay context discovery issues
+- Improved error handling for missing context scenarios
+- Better fallback mechanisms for different app architectures
+- Enhanced hot reload stability
+
+### 📚 **Documentation Updates**
+- Comprehensive migration guide in all README files (English, Korean, Japanese)
+- Updated code examples showcasing auto-injection
+- Enhanced troubleshooting sections
+- Clear before/after migration examples
+
+---
+
 ## [0.1.2] - 2025-08-08
 
 ### 🔧 Improvements

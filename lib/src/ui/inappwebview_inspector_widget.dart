@@ -8,14 +8,12 @@ import '../services/inappwebview_inspector_script_history_manager.dart';
 import '../services/inappwebview_inspector_script_history.dart';
 import 'inappwebview_inspector_script_history_controller.dart';
 import 'inappwebview_inspector_focus_controller.dart';
+import 'inappwebview_inspector_header_widget.dart';
 import '../utils/inappwebview_inspector_constants.dart';
 import '../utils/inappwebview_inspector_localizations.dart';
 
-// Size modes for WebView inspector (private to this file)
-enum _SizeMode {
-  medium,
-  maximized;
-
+// Size calculation helper extension
+extension InAppWebViewInspectorSizeModeExtension on InAppWebViewInspectorSizeMode {
   /// Get the size for this mode
   Size getSize(Size? maximizedSize, double screenWidth) {
     final width =
@@ -23,9 +21,11 @@ enum _SizeMode {
             InAppWebViewInspectorConstants.defaultWidgetWidth, double.infinity);
 
     switch (this) {
-      case _SizeMode.medium:
+      case InAppWebViewInspectorSizeMode.minimal:
+        return const Size(60, 40); // Fixed compact size for minimal mode
+      case InAppWebViewInspectorSizeMode.medium:
         return Size(width, InAppWebViewInspectorConstants.defaultWidgetHeight);
-      case _SizeMode.maximized:
+      case InAppWebViewInspectorSizeMode.maximized:
         return maximizedSize ??
             Size(width, InAppWebViewInspectorConstants.defaultWidgetHeight);
     }
@@ -72,7 +72,8 @@ class _InAppWebViewInspectorWidgetState
   bool _isDragging = false;
 
   // Size modes
-  _SizeMode _sizeMode = _SizeMode.medium;
+  InAppWebViewInspectorSizeMode _sizeMode = InAppWebViewInspectorSizeMode.medium;
+  InAppWebViewInspectorSizeMode _previousSizeMode = InAppWebViewInspectorSizeMode.medium; // Store previous mode for restoration
 
   // Size constants
   late Size _maximizedSize;
@@ -278,7 +279,9 @@ class _InAppWebViewInspectorWidgetState
 
   void _measureAndUpdateInputFieldHeight() {
     final renderBox = _getInputFieldRenderBox();
-    if (renderBox == null) return;
+    if (renderBox == null) {
+      return;
+    }
 
     final newHeight = renderBox.size.height;
     if (_isInputFieldHeightChanged(newHeight)) {
@@ -321,7 +324,9 @@ class _InAppWebViewInspectorWidgetState
   }
 
   void _showHistoryPopup() {
-    if (_isHistoryPopupOpen) return;
+    if (_isHistoryPopupOpen) {
+      return;
+    }
 
     final history = _historyController?.history ?? _scriptHistory;
     setState(() {
@@ -530,7 +535,7 @@ class _InAppWebViewInspectorWidgetState
         builder: (context, constraints) {
           _safeAreaSize = Size(constraints.maxWidth, constraints.maxHeight);
 
-          if (_sizeMode == _SizeMode.maximized) {
+          if (_sizeMode == InAppWebViewInspectorSizeMode.maximized) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
               setState(() {
                 _maximizedSize =
@@ -538,6 +543,11 @@ class _InAppWebViewInspectorWidgetState
                 _size = _sizeMode.getSize(_maximizedSize, constraints.maxWidth);
               });
             });
+          }
+
+          // Show minimal view when in minimal mode
+          if (_sizeMode == InAppWebViewInspectorSizeMode.minimal) {
+            return _buildMinimalView(constraints);
           }
 
           return Stack(
@@ -618,63 +628,36 @@ class _InAppWebViewInspectorWidgetState
   }
 
   Widget _buildHeader() {
-    return Container(
-      height: 50,
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      decoration: BoxDecoration(
-        color: Colors.grey.shade800,
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(8),
-          topRight: Radius.circular(8),
+    return InAppWebViewInspectorHeaderWidget(
+      currentSizeMode: _sizeMode,
+      onMinimize: _toggleToMinimalMode,
+      onMedium: () => _setSizeMode(InAppWebViewInspectorSizeMode.medium),
+      onMaximize: () => _setSizeMode(InAppWebViewInspectorSizeMode.maximized),
+      onClose: () => _inspector.hideInspector(),
+    );
+  }
+
+  Widget _buildHeaderButton({
+    required VoidCallback onPressed,
+    required IconData icon,
+    required Color color,
+    required double size,
+    required String tooltip,
+  }) {
+    return SizedBox(
+      width: 32,
+      height: 32,
+      child: IconButton(
+        onPressed: onPressed,
+        icon: Icon(
+          icon,
+          color: color,
+          size: size,
         ),
-      ),
-      child: Row(
-        children: [
-          const Icon(Icons.web, color: Colors.white, size: 20),
-          const SizedBox(width: 8),
-          const Expanded(
-            child: Text(
-              'WebView Monitor',
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 12,
-              ),
-              overflow: TextOverflow.ellipsis,
-              maxLines: 1,
-            ),
-          ),
-          IconButton(
-            onPressed: () => _setSizeMode(_SizeMode.medium),
-            icon: Icon(
-              Icons.crop_square,
-              color: _sizeMode == _SizeMode.medium ? Colors.blue : Colors.white,
-              size: 16,
-            ),
-            tooltip: '중간',
-          ),
-          IconButton(
-            onPressed: () => _setSizeMode(_SizeMode.maximized),
-            icon: Icon(
-              Icons.maximize,
-              color:
-                  _sizeMode == _SizeMode.maximized ? Colors.blue : Colors.white,
-              size: 16,
-            ),
-            tooltip: '최대',
-          ),
-          IconButton(
-            onPressed: () {
-              _inspector.hideInspector();
-            },
-            icon: const Icon(
-              Icons.close,
-              color: Colors.white,
-              size: 18,
-            ),
-            tooltip: '모니터 숨기기',
-          ),
-        ],
+        tooltip: tooltip,
+        padding: EdgeInsets.zero,
+        constraints: const BoxConstraints(),
+        splashRadius: 16,
       ),
     );
   }
@@ -748,7 +731,9 @@ class _InAppWebViewInspectorWidgetState
   }
 
   void _showCustomDropdown() {
-    if (_isDropdownOpen || _webViews.isEmpty) return;
+    if (_isDropdownOpen || _webViews.isEmpty) {
+      return;
+    }
 
     setState(() {
       _isDropdownOpen = true;
@@ -1132,22 +1117,139 @@ class _InAppWebViewInspectorWidgetState
     });
   }
 
-  void _setSizeMode(_SizeMode mode) {
+  void _setSizeMode(InAppWebViewInspectorSizeMode mode) {
     setState(() {
+      // Store previous mode for restoration (but don't store minimal mode)
+      if (_sizeMode != InAppWebViewInspectorSizeMode.minimal) {
+        _previousSizeMode = _sizeMode;
+      }
+      
       _sizeMode = mode;
       _size = mode.getSize(_maximizedSize, _safeAreaSize.width);
 
-      if (mode == _SizeMode.maximized) {
+      if (mode == InAppWebViewInspectorSizeMode.maximized) {
         _position = const Offset(0, 0);
       }
 
-      if (mode != _SizeMode.maximized) {
+      if (mode != InAppWebViewInspectorSizeMode.maximized) {
         _position = Offset(
           _position.dx.clamp(0.0, _safeAreaSize.width - _size.width),
           _position.dy.clamp(0.0, _safeAreaSize.height - _size.height),
         );
       }
+      
+      // Close popups when switching to minimal mode
+      if (mode == InAppWebViewInspectorSizeMode.minimal) {
+        _closeHistoryPopup();
+        _closeCustomDropdown();
+        _scriptFocusNode.unfocus();
+        FocusScope.of(context).unfocus();
+      }
     });
+  }
+
+  void _toggleToMinimalMode() {
+    _setSizeMode(InAppWebViewInspectorSizeMode.minimal);
+  }
+
+  void _restoreFromMinimalMode() {
+    _setSizeMode(_previousSizeMode);
+  }
+
+  Widget _buildMinimalView(BoxConstraints constraints) {
+    return Stack(
+      children: [
+        Positioned(
+          left: _position.dx,
+          top: _position.dy,
+          child: SizedBox(
+            width: _size.width,
+            height: _size.height,
+            child: GestureDetector(
+              onPanStart: (details) {
+                setState(() {
+                  _isDragging = true;
+                });
+              },
+              onPanUpdate: (details) {
+                if (_isDragging) {
+                  setState(() {
+                    double newX = (_position.dx + details.delta.dx)
+                        .clamp(0.0, constraints.maxWidth - _size.width);
+                    double newY = (_position.dy + details.delta.dy)
+                        .clamp(0.0, constraints.maxHeight - _size.height);
+
+                    _position = Offset(newX, newY);
+                  });
+                }
+              },
+              onPanEnd: (details) {
+                setState(() {
+                  _isDragging = false;
+                });
+              },
+              child: GestureDetector(
+                onTap: _restoreFromMinimalMode,
+                child: Material(
+                  elevation: 8,
+                  borderRadius: BorderRadius.circular(6),
+                  child: Container(
+                    width: _size.width,
+                    height: _size.height,
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: 0.9),
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(color: Colors.grey.shade600),
+                    ),
+                    child: Center(
+                      child: Stack(
+                        children: [
+                          const Icon(
+                            Icons.web,
+                            color: Colors.white,
+                            size: 20,
+                          ),
+                          // Show a small dot if there are active WebViews
+                          if (_webViews.isNotEmpty)
+                            Positioned(
+                              right: 0,
+                              top: 0,
+                              child: Container(
+                                width: 6,
+                                height: 6,
+                                decoration: const BoxDecoration(
+                                  color: Colors.green,
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                            ),
+                          // Show red dot if there are new console messages
+                          if (_consoleLogs.isNotEmpty && 
+                              _consoleLogs.any((log) => 
+                                log.level == ConsoleMessageLevel.ERROR))
+                            Positioned(
+                              right: 0,
+                              bottom: 0,
+                              child: Container(
+                                width: 6,
+                                height: 6,
+                                decoration: const BoxDecoration(
+                                  color: Colors.red,
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
   }
 
   Widget _buildHistoryPopupPositioned() {

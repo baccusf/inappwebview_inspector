@@ -2,9 +2,17 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Communication Guidelines
+
+**Language Usage Policy:**
+- **Korean (한국어)**: Use for all interactive communication, explanations, and discussions during development work
+- **English**: Use for all documentation, Git commits, issues, pull requests, and code comments
+
+This ensures clear communication during development while maintaining professional English documentation for the global developer community.
+
 ## Project Overview
 
-This is a Flutter package called `inappwebview_inspector` (version 0.1.0) - a powerful WebView debugging tool for `flutter_inappwebview`. It provides real-time console monitoring, JavaScript execution, and script history management with a draggable overlay interface.
+This is a Flutter package called `inappwebview_inspector` - a powerful WebView debugging tool for `flutter_inappwebview`. It provides real-time console monitoring, JavaScript execution, script history management, and a draggable inspector interface with minimal mode support.
 
 ## Common Development Commands
 
@@ -75,8 +83,8 @@ lib/
 │   ├── services/                # Business logic services
 │   │   ├── inappwebview_inspector_script_history.dart         # History data model
 │   │   └── inappwebview_inspector_script_history_manager.dart # Memory-based history persistence
-│   ├── ui/                     # UI components (완전 구현됨)
-│   │   ├── inappwebview_inspector_widget.dart              # Main UI widget with enhanced console display
+│   ├── ui/                     # UI components
+│   │   ├── inappwebview_inspector_widget.dart              # Main UI widget with minimal mode support
 │   │   ├── inappwebview_inspector_focus_controller.dart    # Focus management
 │   │   └── inappwebview_inspector_script_history_controller.dart # History state controller
 │   └── utils/                  # Utilities and constants
@@ -122,18 +130,102 @@ Console message data model with:
 
 ## Development Workflow
 
-### Adding New Features
-1. Define interface methods in `inappwebview_inspector_interface.dart`
-2. Implement in `inappwebview_inspector_impl.dart` using reactive Streams
-3. Add convenience methods to `inappwebview_inspector.dart`
-4. Update example app in `example/lib/main.dart`
-5. Add tests in `test/` directory
+### Standard Development Process
+
+This project follows a structured development workflow to ensure quality and consistency:
+
+#### 🚀 New Feature Development Workflow
+
+**Phase 1: Planning & Issue Creation**
+1. **Create Implementation Plan**
+   - Analyze requirements and define feature scope
+   - Design technical architecture and approach
+   - Identify affected components and dependencies
+   - Plan testing strategy and quality gates
+
+2. **GitHub Issue Creation**
+   - Use Feature Request template (`.github/ISSUE_TEMPLATE/feature_request.md`)
+   - Include comprehensive feature specification
+   - Set appropriate milestone for target release
+   - Add relevant labels (enhancement, priority level)
+   - Reference any related issues or dependencies
+
+**Phase 2: Development & Implementation**
+3. **Git Flow Branch Management**
+   - Create feature branch from `develop`: `feature/feature-name`
+   - Follow git flow conventions for branch naming
+   - Implement changes following existing code patterns
+
+4. **Code Implementation**
+   - Define interface methods in `inappwebview_inspector_interface.dart`
+   - Implement in `inappwebview_inspector_impl.dart` using reactive Streams
+   - Add convenience methods to `inappwebview_inspector.dart`
+   - Update example app in `example/lib/main.dart`
+   - Add comprehensive tests in `test/` directory
+
+5. **Development Commits**
+   - Make regular commits with clear, descriptive messages
+   - Follow conventional commit format (feat:, fix:, refactor:, etc.)
+   - Include co-authored attribution for Claude Code assistance
+
+**Phase 3: Quality Assurance & PR**
+6. **Pre-PR Quality Checks**
+   - Run `fvm flutter analyze` (must pass with zero warnings)
+   - Run `fvm flutter test` (all tests must pass)
+   - Verify pub.dev package validation passes
+   - Test functionality in example app across platforms
+
+7. **Pull Request Creation**
+   - Use standardized PR template (`.github/PULL_REQUEST_TEMPLATE.md`)
+   - Complete all applicable checklist items
+   - Reference milestone from original issue
+   - Link to related issues using "Closes #123" format
+   - Include comprehensive testing results
+
+**Phase 4: Review & Completion**
+8. **Post-Merge Cleanup**
+   - Update original issue with implementation details
+   - Mark issue as completed and close
+   - Update milestone progress if applicable
+   - Clean up feature branch after successful merge
+
+#### 🐛 Bug Fix Workflow
+
+**Simplified Process for Bug Fixes:**
+1. **Issue Creation**: Use Bug Report template with reproduction steps
+2. **Branch Creation**: Create `fix/bug-description` branch from `develop`
+3. **Implementation**: Fix issue with appropriate tests
+4. **PR Creation**: Use PR template with focus on testing and regression prevention
+5. **Completion**: Close issue after successful merge
+
+#### 📋 Workflow Checklist
+
+**Before Starting Development:**
+- [ ] Feature plan created and documented
+- [ ] GitHub issue created with milestone
+- [ ] Feature branch created from develop
+- [ ] Implementation approach confirmed
+
+**Before Creating PR:**
+- [ ] All code changes committed
+- [ ] `flutter analyze` passes with zero warnings
+- [ ] All tests pass (`flutter test`)
+- [ ] Example app tested and updated
+- [ ] pub.dev validation confirmed
+
+**Before Closing Issue:**
+- [ ] PR merged successfully
+- [ ] Issue updated with final implementation notes
+- [ ] Milestone progress updated
+- [ ] Documentation updated if needed
+
+This structured approach ensures consistent quality, proper documentation, and maintainable development practices.
 
 ### UI Components
 - **InAppWebViewInspectorWidget**: Fully-featured draggable UI widget
 - **Features**: 
   - Draggable overlay interface with SafeArea constraints
-  - Size modes (compact/maximized)
+  - Size modes (minimal/medium/maximized) with one-click toggle
   - WebView selector dropdown
   - JavaScript console input/execution
   - Script history system with usage frequency tracking
@@ -233,29 +325,20 @@ The package supports Android and iOS platforms:
 - **IDE**: VS Code or Android Studio with Flutter extensions
 - **Testing**: Use `flutter test` for unit tests, `cd example && flutter run` for integration testing
 
-## Recent Development History
+## Key Features
 
+### Inspector Widget Capabilities
+- **Multi-Size Modes**: Minimal (60x40px), Medium (responsive), Maximized (full screen)
+- **Smart State Management**: Remembers previous size mode for restoration
+- **Status Indicators**: Visual feedback for WebView activity and console errors
+- **Drag & Drop**: Fully draggable interface with boundary constraints
+- **Script History**: Frequency-based history with pre-loaded common scripts
 
-
-### Package Development Phase (2025-08-08)
-
-**Core Features Implemented:**
-1. **Enhanced Script Execution System**:
-   - **DOM Object Handling**: Added `InAppWebViewInspectorScriptUtils` for safe serialization of DOM objects
-   - **Smart Script Wrapping**: Automatic detection and conversion of DOM elements to readable format
-   - **Enhanced Result Display**: Better formatting for NodeList, HTMLElement, functions, etc.
-
-2. **Console Display Improvements**:
-   - **Multi-line Support**: Added `maxLines: null` and `softWrap: true` for proper text wrapping
-   - **Complete Result Display**: Full results without truncation
-   - **Clean UI**: Removed unnecessary labels for streamlined console output
-
-3. **Script Execution Features**:
-   - ✅ `document.querySelector("selector")` → Shows element info with tag, id, class, textContent
-   - ✅ `document.querySelectorAll("selector")` → Shows all elements in comma-separated format
-   - ✅ `document.body.classList` → Converts to array format
-   - ✅ DOM element serialization with proper error handling
-   - ✅ Enhanced error messages with suggestions for unsupported types
+### Enhanced Script Execution
+- **DOM Object Handling**: Safe serialization of DOM objects and elements
+- **Smart Result Display**: Proper formatting for NodeList, HTMLElement, functions
+- **Multi-line Console**: Complete result display without truncation
+- **Error Handling**: Enhanced error messages with helpful suggestions
 
 ## Naming Convention and Prefixes
 
@@ -307,11 +390,11 @@ inappwebview_inspector_localizations.dart      # Localization
 - **Maintainability**: Easier to manage and refactor
 - **Professional Standard**: Follows Flutter/Dart naming conventions
 
-### Future Improvements
-- Performance optimization: Console log virtualization for handling large volumes
-- Dark mode support
-- Keyboard shortcuts support
-- Additional script templates
+### Future Roadmap
+- Performance optimization: Console log virtualization for large volumes
+- Dark mode support and theme customization
+- Keyboard shortcuts and accessibility improvements
+- Additional script templates and developer tools integration
 
 ## Critical Implementation Notes
 
@@ -350,7 +433,7 @@ MaterialApp(
 ```bash
 # Must use fvm for consistency
 fvm flutter pub get
-fvm flutter analyze
+fvm flutter analyze   # Must pass with no linting errors
 fvm flutter test
 fvm flutter build ios --simulator
 fvm flutter run
@@ -358,3 +441,74 @@ fvm flutter run
 # Do not use regular flutter commands
 # flutter pub get  # ❌ 
 ```
+
+## Code Quality Standards
+
+### Lint Rule Compliance
+This package follows strict linting rules for pub.dev compliance and code quality:
+
+1. **Required Curly Braces**: All if statements must include curly braces, even for single-line statements
+   ```dart
+   // ✅ Correct - with curly braces
+   if (condition) {
+     doSomething();
+   }
+   
+   // ❌ Incorrect - missing curly braces
+   if (condition) doSomething();
+   ```
+
+2. **Analysis Requirements**: 
+   - `fvm flutter analyze` must pass with zero warnings/errors
+   - All pub.dev package validation checks must pass
+   - Consistent code formatting across all files
+
+3. **Quality Checklist**:
+   - ✅ No lint warnings or errors
+   - ✅ Consistent code style and formatting
+   - ✅ All if statements have curly braces
+   - ✅ Proper documentation and comments
+   - ✅ Pass pub.dev package validation
+
+## GitHub Issue and PR Templates
+
+This project uses standardized templates to ensure consistent documentation and streamline the development workflow:
+
+### Issue Templates
+
+**Feature Request Template** (`.github/ISSUE_TEMPLATE/feature_request.md`)
+- Structured format for proposing new features
+- Includes sections for requirements, implementation approach, user flow, and success criteria
+- Ensures comprehensive feature documentation before development
+
+**Bug Report Template** (`.github/ISSUE_TEMPLATE/bug_report.md`)
+- Systematic bug reporting with reproduction steps
+- Environment details and error information
+- Impact assessment and potential workarounds
+
+### Pull Request Template
+
+**Standardized PR Template** (`.github/PULL_REQUEST_TEMPLATE.md`)
+- Consistent structure for all pull requests
+- Comprehensive testing and quality assurance checklists
+- Clear categorization of changes (feature/fix/enhancement)
+- Links to related issues and includes reviewer guidelines
+
+### Template Usage Guidelines
+
+**For Issues:**
+1. **Feature Requests**: Use the feature request template for all new functionality
+2. **Bug Reports**: Use the bug report template for defects and issues
+3. **Clear Titles**: Use conventional commit format (feat:, fix:, docs:, etc.)
+4. **Complete Information**: Fill out all relevant sections thoroughly
+
+**For Pull Requests:**
+1. **Comprehensive Testing**: Complete all applicable test checklist items
+2. **Quality Assurance**: Verify all QA requirements before submitting
+3. **Clear Descriptions**: Provide detailed descriptions of changes and impact
+4. **Link Issues**: Always link to related issues using "Closes #123" format
+
+**Template Compliance:**
+- All issues and PRs should follow the provided templates
+- Templates ensure consistent documentation and make reviews more efficient
+- Missing information in templates may result in requests for additional details
