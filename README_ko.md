@@ -70,7 +70,7 @@
 
 ```yaml
 dependencies:
-  inappwebview_inspector: ^0.2.0
+  inappwebview_inspector: ^0.2.1
   flutter_inappwebview: ^6.1.5
 ```
 
@@ -402,7 +402,7 @@ MaterialApp(
 #### 1단계: 의존성 업데이트
 ```yaml
 dependencies:
-  inappwebview_inspector: ^0.2.0  # 업데이트됨
+  inappwebview_inspector: ^0.2.1  # 업데이트됨
   flutter_inappwebview: ^6.1.5
 ```
 
@@ -519,7 +519,7 @@ Scaffold(
 앱에서 flutter_inappwebview를 git 소스로 사용하는 경우:
 ```yaml
 dependencies:
-  inappwebview_inspector: ^0.2.0
+  inappwebview_inspector: ^0.2.1
   flutter_inappwebview:
     git:
       url: https://github.com/pichillilorenzo/flutter_inappwebview.git

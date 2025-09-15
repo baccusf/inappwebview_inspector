@@ -70,7 +70,7 @@ Add this to your package's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  inappwebview_inspector: ^0.2.0
+  inappwebview_inspector: ^0.2.1
   flutter_inappwebview: ^6.1.5
 ```
 
@@ -556,7 +556,7 @@ MaterialApp(
 #### Step 1: Update Dependencies
 ```yaml
 dependencies:
-  inappwebview_inspector: ^0.2.0  # Updated
+  inappwebview_inspector: ^0.2.1  # Updated
   flutter_inappwebview: ^6.1.5
 ```
 
@@ -673,7 +673,7 @@ Scaffold(
 If your app uses flutter_inappwebview from git source:
 ```yaml
 dependencies:
-  inappwebview_inspector: ^0.2.0
+  inappwebview_inspector: ^0.2.1
   flutter_inappwebview:
     git:
       url: https://github.com/pichillilorenzo/flutter_inappwebview.git
